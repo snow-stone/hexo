@@ -63,5 +63,5 @@ $ diff bashrc.Debug bashrc.org
 # 初学有用的技巧
 0. 在计算过程中（提交算例后有个申请的计算时长），发现CFL比较大时间步`deltaT`可以实时改小，可以修改输出间隔，包括粘性`nu`(这个是因为createFields.H里面`MUST_READ_IF_MODIFIED`)都属于runTime-modifiable。湍流模型、边界条件（不确定）、求解器设置(`fvSolution`和`fvScheme`)属于runTime-selectable。
 1. changeDictionary
-2. topoSet
+2. topoSet : topoSet 不仅可以得到一个labelList，而且这个labelList还可以用paraview可视化。假如`cellSet`名为`cylTurbGenerator`，`foamToVTK -cellSet cylTurbGenerator -latestTime` 这样就会有`*.vtk`生成，注意到这里面patch和internalMesh似乎被分开了。
 3. m4 - blockMeshDict
