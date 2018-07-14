@@ -8,7 +8,9 @@ tags:
 1. Linux
 2. vim: 有[OpenFOAM关键词自动补全插件](https://bitbucket.org/shor-ty/vimextensionopenfoam)
 3. eclipse: 虽然代码自动跳转不全，但看代码的时候用用鼠标也能省点力气
-4. meld: 对比代码非常好用，相对vim优势在有GUI
+4. meld: 对比代码非常好用，相对vim优势在有GUI，diff算法加上颜色高亮
+5. python: OpenFOAM后处理有时会用到字符串的处理，python本身还有很棒的库，用字典可以将一个case的不同属性参数组合并存储{比如路径，粘性，雷诺数，后处理相关(utility sample后得到postProcessing路径下的数据shape是多大[检查读入数据shape以防溢出或者意外情况]，后处理的时间区间与步长[用于在不同时间目录下读取相应后处理数据])}
+6. spyder: python IDE，用matplotlib画图便于在同一窗口下实时查看结果，鼠标点击module直接跳转，实时的变量查询。缺点是不能在窗口下生成动画，或者是可以转动的3D图，这种时候改用命令行纯的python解释器就好
 
 # 手动编译源码
 ## 在win10上bash子系统ubuntu编译流程
