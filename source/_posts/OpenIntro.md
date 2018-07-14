@@ -67,3 +67,14 @@ $ diff bashrc.Debug bashrc.org
 1. changeDictionary
 2. topoSet : topoSet 不仅可以得到一个labelList，而且这个labelList还可以用paraview可视化。假如`cellSet`名为`cylTurbGenerator`，`foamToVTK -cellSet cylTurbGenerator -latestTime` 这样就会有`*.vtk`生成，注意到这里面patch和internalMesh似乎被分开了。
 3. m4 - blockMeshDict
+
+# coding style
+从官方coding style里面抠出了个人觉得受益的几个：
+1. 缩进全用空格而不用tab
+2. 输出的时候`<<`符号总是由四个空格的时候开始（尤其换行继续输出的时候）
+3. inline function 在对应的classNameI.H里
+4. 在.C文件不open/close任何的namespace，用full scope i.e. `Foam::returnType Foam::className::functionName()`；但这里有特例，例如有几层namespace嵌套的时候:Foam/compressible/RASModels
+5. 传入参数，如果是bool,label,scalar等用copy，其他更大的数据通过reference传址
+6. 改用const就用const
+7. 初始化用`const className& variableName = otherClass.data();`而不是`const className& variableName(otherClass.data())`
+8. 如果基类为virtual，那么子类前面也都加上关键词virtual
