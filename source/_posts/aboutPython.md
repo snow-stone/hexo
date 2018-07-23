@@ -6,12 +6,12 @@ tags:
 
 # Python环境
 
-![aboutPython](aboutPython.png)
 都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头   
+![aboutPython](aboutPython.png)
 实验室哥们推荐我就用pip，他给我的使用建议：   
-安装scipy，`pip install --user scipy`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
-移除所安装的包直接删除对应位置的文件即可，如果想用另一个版本直接将当前的包删除即可，这样干净整洁不容易出错      
-查看包的版本   
+**安装**scipy，`pip install --user scipy`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
+**移除**所安装的包直接删除对应位置的文件即可，如果想用另一个版本直接将当前的包删除即可，这样干净整洁不容易出错      
+**查看包的版本**   
 ```bash
 $ pip install scipy==
 Collecting scipy==
@@ -20,6 +20,7 @@ No matching distribution found for scipy==
 You are using pip version 9.0.3, however version 10.0.1 is available.
 You should consider upgrading via the 'pip install --upgrade pip' command.
 ```
+
 
 ## 安装特例
 
