@@ -4,7 +4,7 @@ date: 2018-07-15 14:55:23
 tags:
 ---
 
-# Python环境
+# 环境
 都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头 
 ![](pythonEnv.png)
 
@@ -43,7 +43,7 @@ anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管
 3. 注释和去注释方便，缩进和去缩进方便，高亮易辨识
 4. 鼠标点击函数，在不同的库之间跳转
 
-# python基本数据类型
+# 基本数据类型
 **Sequence Types** — str, unicode, list, tuple, bytearray, buffer, xrange  
 1. str : string, written in single or double quotes
 2. unicode : unicode string, much like string
@@ -69,7 +69,7 @@ Dictionaries can be created by placing a comma-separated list of key: value pair
 
 以上是抄写，这里是个人使用心得：list里面可以放不同类型的变量，很有用；tuple可以作为函数return多个值的时候的选项例如`fig, ax = plt.subplots()`，当然dictionary也可以；我在OpenFOAM后处理脚本里面用到dict，因为一个dictionary就可以包含算例的绝对路径、后处理时间区间，后处理数据shape...更重要的是在程序读取并处理数据时，主程序里`暴露`出从key到value的过程，比如如果我画平均值就取名为`mean`，如果画均方根就取名为`rms`，这样后处理程序可读性会大大提高；numpy里面array当然用得很多，list可以转化为array
 
-# python库的使用
+# 库的使用
 python强大的地方当然是有各种很棒的库的支持(numpy, scipy, matplotlib等)，使用库用关键字`import`就行。如何查询所用库的路径？进入ipython
 ```bash
 In [1]: import numpy as np
@@ -161,8 +161,7 @@ sampling={
 
 dataEntry={
         'startTime':5.5,  # KinecticEnergy stationary
-        'endTime':7.2,
-        'chunkStep':50,
+        'endTime':7.2, 'chunkStep':50,
         'NbOfFiles':171,
         'path':"/store/caseByGeometry/T/new-mesh/pointwise/postProcessing/1d_mapped_NearestFace",
         }
