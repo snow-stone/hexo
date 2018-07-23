@@ -150,11 +150,25 @@ physics={
 
 sampling={
         'raw_sample_size':160,
-#        'dataShape':(199,4)     # uniform   # 这里展示了这个后处理过程的复杂性:
-                                             # 因为OpenFOAM sample sets操作后的数组用不同mode输出的数据长度不同
-#        'dataShape':(188,4)     # face 3    # 例如: uniform 和 face 两个mode下输出的长度不同
-        'dataShape':(195,4)     # face 2     # 在同一mode下不同的地方进行sample操作也可能得(对于复杂的几何外形的算例，网格在空间不均匀，换个sample的位置，几乎一定会变)的不同长度的数据，例如这里的 face 1,2,3
-#        'dataShape':(195,4)     # face 1    # 为何要确定长度？因为如果做空间统计（这个例子是时间，只要网格不变，sets不变那数据长度就不变，因为取样的labelList不变），比如在周期条件的圆管流动里，里面沿着半径方向取一系列数学上有对称性的sets，然后想求对于sets的平均（即空间平均），每个sets在这里对应一个数据文件。这时候即使是相当规则的网格（butterfly分成5块），我的测试结果是:这一系列看起来数学上完全对称的sets有时候也会出现个别的特例（要么输出数据长度为0，要么输出数据跟大部分的shape不同，OpenFOAM当然不会报错警告你，所以我自己建立了一个检查机制，这样呢就需要一个目标shape和读取实际数据shape的对照的过程，这样每次后处理我就知道是否有exception。在这里，通过这样一个dictionary完成了参数parameters['sampling']['dataShape']的传递）
+#        'dataShape':(199,4)     # uniform 
+#        'dataShape':(188,4)     # face 3 
+        'dataShape':(195,4)     # face 2     
+#        'dataShape':(195,4)     # face 1    
+
+# 这里展示了这个后处理过程的复杂性：dataShape有多个值
+# 因为OpenFOAM sample sets操作后的数组用不同mode输出的数据长度不同
+# 例如: uniform 和 face 两个mode下输出的长度不同，在同一mode下不同的地方进行sample操作也可能得(对于
+# 复杂的几何外形的算例，网格在空间不均匀，换个sample的位置，几乎一定会变)的不同长度的数据，例如这里的
+# face 1,2,3
+
+# 为何要确定长度？因为如果做空间统计（这个例子是时间，只要网格不变，sets不变那数据长度就不变，因为取
+# 样的labelList不变），比如在周期条件的圆管流动里，里面沿着半径方向取一系列数学上有对称性的sets，然后
+# 想求对于sets的平均（即空间平均），每个sets在这里对应一个数据文件。这时候即使是相当规则的网格（butterfly
+# 分成5块），我的测试结果是:这一系列看起来数学上完全对称的sets有时候也会出现个别的特例（要么输出数据
+# 长度为0，要么输出数据跟大部分的shape不同，OpenFOAM当然不会报错警告你，所以我自己建立了一个检查机制，
+# 这样呢就需要一个目标shape和读取实际数据shape的对照的过程，这样每次后处理我就知道是否有exception。
+
+# 于是在这里，通过这样一个dictionary完成了参数parameters['sampling']['dataShape']的传递）
         }
 
 # data entry parameters
