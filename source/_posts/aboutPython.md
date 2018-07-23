@@ -181,6 +181,8 @@ parameters={
 
 加上pre_check会对读入数据是否valid进行判断，因此也易于debug。
 
+用spyder来操作，实时得图，实时跳转至库文件编辑，实时在主程序调整画图的参数。
+
 ```python
 
 # 主程序
