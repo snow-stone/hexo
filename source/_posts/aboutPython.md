@@ -6,8 +6,8 @@ tags:
 
 # Python环境
 
-都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头   
 ![aboutPython](aboutPython.png)
+都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头    
 
 ## pip
 实验室哥们推荐我就用pip，他给我的使用建议：   
@@ -33,4 +33,4 @@ $ pip install --user h5py # 预编译好的
 $ pip install --no-binary=h5py h5py --user # no-binary 版本
 ```
 ## anaconda
-anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他该写了timeVaryingMappedFixedValue，把输出格式改成了HDF5），就`h5py`来说，pip网上的资料还是多些。
+anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5），就`h5py`来说，pip网上的资料还是多些。
