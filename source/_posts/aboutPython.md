@@ -237,7 +237,7 @@ main() # 执行main函数
 小结：这里主要借我自己在OpenFOAM中后处理的用法（库，库的嵌套，字典，深度拷贝，函数返回值可以是多个[tuple或者dict]）来介绍**python的基本数据类型**，会在另一篇博客中给出针对`sample`这个重要的OpenFOAM utility的全部流程。
 
 
-## Debug
+# Debug
 文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
 ```bash
 $ python -t script.py
@@ -246,5 +246,5 @@ $ python -t script.py
 $ cat -A script.py
 # On *nix systems, you can see where the tabs
 ```
-### spyder
+## spyder
 有次遇到了`TypeError: 'str' object is not callable`，找了半天都没有头绪，结果重启spyder就好了。说明有些错，真不简单，试试重启大法。
