@@ -70,7 +70,7 @@ Dictionaries can be created by placing a comma-separated list of key: value pair
 以上是抄写，这里是个人使用心得：list里面可以放不同类型的变量，很有用；tuple可以作为函数return多个值的时候的选项例如`fig, ax = plt.subplots()`，当然dictionary也可以；我在OpenFOAM后处理脚本里面用到dict，因为一个dictionary就可以包含算例的绝对路径、后处理时间区间，后处理数据shape...更重要的是在程序读取并处理数据时，主程序里`暴露`出从key到value的过程，比如如果我画平均值就取名为`mean`，如果画均方根就取名为`rms`，这样后处理程序可读性会大大提高；numpy里面array当然用得很多，list可以转化为array
 
 # python库的使用
-python强大的地方当然是有各种很棒的库的支持(numpy, scipy, matplotlib等)，还可以查询所用库的路径，进入ipython
+python强大的地方当然是有各种很棒的库的支持(numpy, scipy, matplotlib等)，使用库用关键字`import`就行。如何查询所用库的路径？进入ipython
 ```bash
 In [1]: import numpy as np
 In [2]: np.__                   # 自动补全
@@ -84,9 +84,9 @@ In [2]: np.__path__
 Out[2]: ['/home/hluo/.local/lib/python2.7/site-packages/numpy'] # 可以看到输出的是一个list，里面路径变量是str
 ```
 ## 自定义库
-自定义库也很简单，写了一个脚本叫`Dai_thesis.py`，里面有个函数叫`Fig4p8a`，那么在主程序（同一目录下）只需`import Dai_thesis`，然后就可以`Dai_thesis.Fig4p8a()`，在执行主程序的时候`Dai_thesis.pyc`将会自动生成，这是个二进制文件，表明`Dai_thesis.py`以库的形式被使用。当然库的使用也有嵌套，例如:
+自定义库也很简单，写了一个脚本叫`Dai_thesis.py`，里面有个函数叫`Fig4p8a`，那么在主程序（同一目录下）只需`import Dai_thesis`，然后就可以`Dai_thesis.Fig4p8a()`，在执行主程序的时候`Dai_thesis.pyc`将会自动生成，这是个二进制文件，表明`Dai_thesis.py`以库的形式被使用，这样就使用了Dai_theis这篇论文里面Fig4.8(a)里面的数据。当然库的使用也有嵌套，例如在上述基础上加一个层级:
 ```python
-# reference_database.py 我用画图的时候作为对照的的数据来源汇总：杂志文章、博士论文、解析表达式
+# 高层级的库 reference_database.py ： 我画图的时候作为对照的的数据来源汇总：杂志文章、博士论文、解析表达式
 
 import Niewstadt_article_1995
 
@@ -100,7 +100,7 @@ import Eggels_article_1994
 
 
 
-# Dai_thesis.py
+# 低一个层级的 Dai_thesis.py : 功用是去特定的地方读特定的文件，返回numpy array组成的一个tuple
 
 import numpy as np
 
@@ -136,36 +136,7 @@ def Fig4p9a(fluid):
    
 
 
-# 主程序
-import matplotlib.pyplot as plt
-import reference_database as rdb
-
-def main():
-	import timeSeriesReader_ReturnOuterVariables as tsR                    #  自定义库，做时间平均
-	import parameters_T_RES1d_MethodMapped_subMethod_NearestFace as ps_map #  某算例的parameter文件(通过库的方式传递到主程序)，其实就是一个dictionary
-
-	fig1,ax1 = plt.subplots()
-
-#	plot my data
-#   ...
-#	这里通过ps_map这个库，去相应路径找待处理的数据(例如OpenFOAM sample的结果)
-	l_1d_map2 = tsR.pre_check(ps_map.parameters,"Dai_lines_typeFace_cell-2")       # precheck检查数据是否valid （下面在dataShape处有解释）
-    db_1d_map2 = tsR.process(ps_map.parameters,validDataList=l_1d_map2,colonNb=1)  # 读取valid的数据，做相应后处理，返回一个dictionary
-
-    Ux_bulk_Dai=0.3
-	ax1.plot(db_1d_map2['rByD'],db_1d_map2['mean']/Ux_bulk_Dai,label='mapped-2',linewidth=2) # 画图，x轴为rByD，y轴为平均值，无量纲化显式出现
-#   ...
-
-#   reference plot
-    x1,y1 = rdb.Dai_thesis.Fig4p9a('EAU')  # 嵌套关系表示这里画的是Dai_thesis里面图Fig4.9(a)里面EAU这条线
-    ax1.plot(-x1+0.5, y1, label='Dai-2', marker='s', markerfacecolor='none', linewidth=2) # 在同一幅图里面画上对照数据
-#	...
-#	...
-
-main() # 执行main函数
-
-
-# 再看看 parameters_T_RES1d_MethodMapped_subMethod_NearestFace.py
+# parameters_T_RES1d_MethodMapped_subMethod_NearestFace.py ： 用dict存储一个OpenFOAM算例后处理里的复合数据类型
 
 # physical parameters
 
@@ -201,5 +172,43 @@ parameters={
         'sampling':sampling,
         'dataEntry':dataEntry,
         }
+
+```
+
+最后看看主程序，`rdb.Dai_thesis.Fig4p9a()`完成了对几个自定义库的嵌套，可读性强;函数传入一个dict比传入一长串参数可读性强，比如`tsR.pre_check(ps_map.parameters,...)`;在主程序中显式操作数据（无量纲化，坐标轴变换），有迹可循。可读性是强了，可维护性呢？
+
+基于这个主程序，如果要加上另一个算例(例如空间分辨率不同)的结果画在同一个图中，该怎么做呢？编辑另一个算例相应的dict（路径，时间区间等）,然后在主程序开头处import即可(注意，实际上编辑的不是dict，而是库，我这里通过库的形式传入dict)；如果要对同一个算例，画出在两个时间区间的统计结果，怎么办？我的做法是`深度复制ps_map.parameters这个dict`，在**主程序**里面显式地修改时间区间（为什么是显式的？因为key是'startTime','endTime'，改的变量是什么对于使用者来说很直观），这样通过这个修改后的dict传入参数，做同样的pre_check和process**两行操作**就可以，主程序仍旧保持着相当一致的格式(较为固定的**两行操作**)。如果要做一个以上两个变种的融合不外乎多几个**两行操作**，易于维护。
+
+加上pre_check会对读入数据是否valid进行判断，因此也易于debug。
+
+```python
+
+# 主程序
+import matplotlib.pyplot as plt    # python 画图基本库
+import reference_database as rdb   # 自定义数据库
+
+def main():
+    import timeSeriesReader_ReturnOuterVariables as tsR                    #  自定义库，做时间平均
+    import parameters_T_RES1d_MethodMapped_subMethod_NearestFace as ps_map #  自定义库，算例的parameter文件(通过库的方式传递到主程序)，其实就是一个dictionary
+
+    fig1,ax1 = plt.subplots()      # 画图初始化 fig1和ax1
+
+#   plot my data
+#   ...
+#   这里通过ps_map这个库，去相应路径找待处理的数据(例如OpenFOAM sample的结果)
+    l_1d_map2 = tsR.pre_check(ps_map.parameters,"Dai_lines_typeFace_cell-2")       # precheck检查数据是否valid （上面在dataShape处有解释）
+    db_1d_map2 = tsR.process(ps_map.parameters,validDataList=l_1d_map2,colonNb=1)  # 仅读取valid数据，做相应后处理，返回一个dictionary
+
+    Ux_bulk_Dai=0.3
+    ax1.plot(db_1d_map2['rByD'],db_1d_map2['mean']/Ux_bulk_Dai,label='mapped-2',linewidth=2) # 画图，x轴为rByD，y轴为平均值，无量纲化显式操作
+#   ...
+
+#   reference plot
+    x1,y1 = rdb.Dai_thesis.Fig4p9a('EAU')  # 嵌套关系表示这里画的是Dai_thesis里面图Fig4.9(a)里面EAU这条线
+    ax1.plot(-x1+0.5, y1, label='Dai-2', marker='s', markerfacecolor='none', linewidth=2) # 在同一幅图里面画上对照数据，原始数据需要做变换，显式操作
+#	...
+#	...
+
+main() # 执行main函数
 
 ```
