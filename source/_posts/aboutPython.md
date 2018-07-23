@@ -11,7 +11,8 @@ tags:
 ## pip
 实验室哥们推荐我就用pip，他给我的使用建议：   
 **安装**scipy，`pip install --user scipy`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
-**移除**所安装的包直接删除对应位置的文件即可，如果想用另一个版本直接将当前的包删除即可，这样干净整洁不容易出错      
+**更新**scipy，`pip install scipy --user -U`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
+**移除**所安装的包直接删除对应位置的文件即可，如果想用另一个版本直接将当前的包删除即可，这样干净整洁不容易出错，此例中`rm -rf $HOME/.local/lib/python2.7/site-packages/scipy*`      
 **查看包的版本**   
 ```bash
 $ pip install scipy==
@@ -21,6 +22,7 @@ No matching distribution found for scipy==
 You are using pip version 9.0.3, however version 10.0.1 is available.
 You should consider upgrading via the 'pip install --upgrade pip' command.
 ```
+如果是python3的库，那么就改用`pip3`，库函数就会放在`$HOME/.local/lib/python3.4/site-packages`（这里是3.4）
 ### 安装特例
 `h5py`的安装需要用到`devel`包（for developper 或者叫 no-binary 包），因为基于`h5py`的特性需要基于已有的`mpi`和`hdf5`重新编译，比如安装的时候报错`Python.H not found`，那就说明python包里面该有`*.H`的地方没有源文件，也许安装的不是开发者安装包（仅仅是pre-compiled后的库函数），当然另一个情况是给的头文件寻找路径不对。那如果报错是找不到`mpi.h`或者`hdf5.h`，那么就是环境中找不到`mpi`或`hdf5`包里的头文件，也对应前面两种可能。
 
@@ -42,6 +44,10 @@ anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管
 2. 库函数自动补全
 3. 注释和去注释方便，缩进和去缩进方便，高亮易辨识
 4. 鼠标点击函数，在不同的库之间跳转
+
+**福利**：spyder -> File -> Print to File (PDF) 有语法高亮
+
+**局限**: 在3d plot里面有些图（比如3D云图）是可以鼠标拖着旋转的，但在spyder里面就是个静止的图（可能原因在于就其本源可能还不如货真价实的ipython console）；因此animation当然也在spyder里面看不了,这个时候就都得回到无IDE下的python解释器环境
 
 # 基本数据类型
 **Sequence Types** — str, unicode, list, tuple, bytearray, buffer, xrange  
@@ -229,3 +235,16 @@ main() # 执行main函数
 ```
 
 小结：这里主要借我自己在OpenFOAM中后处理的用法（库，库的嵌套，字典，深度拷贝，函数返回值可以是多个[tuple或者dict]）来介绍**python的基本数据类型**，会在另一篇博客中给出针对`sample`这个重要的OpenFOAM utility的全部流程。
+
+
+## Debug
+文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
+```bash
+$ python -t script.py
+# This will warn you if you have mixed tabs and spaces
+
+$ cat -A script.py
+# On *nix systems, you can see where the tabs
+```
+### spyder
+有次遇到了`TypeError: 'str' object is not callable`，找了半天都没有头绪，结果重启spyder就好了。说明有些错，真不简单，试试重启大法。
