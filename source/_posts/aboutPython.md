@@ -31,5 +31,175 @@ You should consider upgrading via the 'pip install --upgrade pip' command.
 $ pip install --user h5py # 预编译好的
 $ pip install --no-binary=h5py h5py --user # no-binary 版本
 ```
+
 ## anaconda
 anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5），就`h5py`来说，pip网上的资料还是多些。
+
+# IDE
+我在windows和linux下也都有anaconda，主要用在包里的spyder，可以实时查看数组变量（函数内部的变量在IDE里面查看不了，因为没有暴露在当前执行脚本的环境中），这在python学习初期很有用，在初期学习中可以有意识地不写函数，这样所有的变量都在可追溯的`Variable explorer`里面便于实时查看。想要查看某变量的类型，在里面集成的ipython console通过`type(variable)`输出即可。   
+我选spyder的主要原因：   
+1. 用matplotlib画图的时候就在ipython console即时输出图片，避免另弹出画图的新窗口+手动关闭窗口，看到图片就可以调整legend的位置还有字体大小什么的，很直观；如果要拷贝图片另存为png格式直接右键`save image as`就可以，所见即所得（为何这样说？如果legend在图片box外面，`savefig`不会将legend包括进去，也就说savefig最终不会包含box外的legend）。
+2. 库函数自动补全
+3. 注释和去注释方便，缩进和去缩进方便，高亮易辨识
+4. 鼠标点击函数，在不同的库之间跳转
+
+# python基本数据类型
+**Sequence Types** — str, unicode, list, tuple, bytearray, buffer, xrange  
+1. str : string, written in single or double quotes
+2. unicode : unicode string, much like string
+3. list : constructed by square brackets, its element seperated by comma
+4. tuple : constructed by the comma operator (not within square brackets), with or without enclosing parentheses, but an empty tuple must have the enclosing parentheses, such as a, b, c or (). A single item tuple must have a trailing comma, such as (d,).
+5. bytearray : created with the built-in function bytearray()
+6. buffer : Buffer objects are not directly supported by Python syntax, but can be created by calling the built-in function buffer()
+7. xrange : similar to buffers in that there is no specific syntax to create them, but they are created using the xrange() function
+
+**Operators on list**  
+```python
+>>> myList = ["The", "earth", "revolves", "around", "sun"] # initialize a list with double quotes
+>>> myList
+ ['The', 'earth', 'revolves', 'around', 'sun'] # output are single quoted
+>>> myList = myList + ["sure"]  # need a list to perform operator+ on list objects
+>>> myList
+ ['The', 'earth', 'revolves', 'around', 'sun', 'sure'] # list + list = list
+```
+
+**Sequence Types** -- dict  
+A mapping object maps hashable values to arbitrary objects. Mappings are mutable objects (in c++ there are also mutable objects, what are they?). There is currently **only one** standard mapping type, the dictionary.
+Dictionaries can be created by placing a comma-separated list of key: value pairs within braces, for example: {'jack': 4098, 'sjoerd': 4127} or {4098: 'jack', 4127: 'sjoerd'}, or by the dict constructor.
+
+以上是抄写，这里是个人使用心得：list里面可以放不同类型的变量，很有用；tuple可以作为函数return多个值的时候的选项例如`fig, ax = plt.subplots()`，当然dictionary也可以；我在OpenFOAM后处理脚本里面用到dict，因为一个dictionary就可以包含算例的绝对路径、后处理时间区间，后处理数据shape...更重要的是在程序读取并处理数据时，主程序里`暴露`出从key到value的过程，比如如果我画平均值就取名为`mean`，如果画均方根就取名为`rms`，这样后处理程序可读性会大大提高；numpy里面array当然用得很多，list可以转化为array
+
+# python库的使用
+python强大的地方当然是有各种很棒的库的支持(numpy, scipy, matplotlib等)，还可以查询所用库的路径，进入ipython
+```bash
+In [1]: import numpy as np
+In [2]: np.__                   # 自动补全
+np.__
+np.__NUMPY_SETUP__   np.__delattr__       np.__getattribute__  np.__new__           np.__repr__          np.__version__
+np.__all__           np.__dict__          np.__git_revision__  np.__package__       np.__setattr__       
+np.__builtins__      np.__doc__           np.__hash__          np.__path__          np.__sizeof__        
+np.__class__         np.__file__          np.__init__          np.__reduce__        np.__str__           
+np.__config__        np.__format__        np.__name__          np.__reduce_ex__     np.__subclasshook__
+In [2]: np.__path__
+Out[2]: ['/home/hluo/.local/lib/python2.7/site-packages/numpy'] # 可以看到输出的是一个list，里面路径变量是str
+```
+## 自定义库
+自定义库也很简单，写了一个脚本叫`Dai_thesis.py`，里面有个函数叫`Fig4p8a`，那么在主程序（同一目录下）只需`import Dai_thesis`，然后就可以`Dai_thesis.Fig4p8a()`，在执行主程序的时候`Dai_thesis.pyc`将会自动生成，这是个二进制文件，表明`Dai_thesis.py`以库的形式被使用。当然库的使用也有嵌套，例如:
+```python
+# reference_database.py 我用画图的时候作为对照的的数据来源汇总：杂志文章、博士论文、解析表达式
+
+import Niewstadt_article_1995
+
+import Dai_thesis
+
+import analytic_functions
+
+import Eggels_thesis
+
+import Eggels_article_1994
+
+
+
+# Dai_thesis.py
+
+import numpy as np
+
+def Fig4p8a(fluid):
+    string='/home/hluo/Pictures/Dai_T/meanProfile_velocity/XEqM4_debitMin/profile_XEqM4_debitMin.csv'
+    data=np.genfromtxt(string,skip_header=1,delimiter=',')
+    
+    switcher={
+        'EAU':1,
+        'PAA':2,
+        'XG':3
+    }
+    
+    x = data[:,0]
+    y = data[:,switcher[fluid]]
+    
+    return x, y
+
+def Fig4p9a(fluid):
+    string='/home/hluo/Pictures/Dai_T/meanProfile_velocity/XEqP12_debitMin/profile_XEqP12_debitMin.csv'
+    data=np.genfromtxt(string,skip_header=1,delimiter=',')
+    
+    switcher={
+        'EAU':1,
+        'PAA':2,
+        'XG':3
+    }
+    
+    x = data[:,0]
+    y = data[:,switcher[fluid]]
+    
+    return x, y
+   
+
+
+# 主程序
+import matplotlib.pyplot as plt
+import reference_database as rdb
+
+def main():
+	import timeSeriesReader_ReturnOuterVariables as tsR                    #  自定义库，做时间平均
+	import parameters_T_RES1d_MethodMapped_subMethod_NearestFace as ps_map #  某算例的parameter文件(通过库的方式传递到主程序)，其实就是一个dictionary
+
+	fig1,ax1 = plt.subplots()
+
+#	plot my data
+#   ...
+#	这里通过ps_map这个库，去相应路径找待处理的数据(例如OpenFOAM sample的结果)
+	l_1d_map2 = tsR.pre_check(ps_map.parameters,"Dai_lines_typeFace_cell-2")       # precheck检查数据是否valid （下面在dataShape处有解释）
+    db_1d_map2 = tsR.process(ps_map.parameters,validDataList=l_1d_map2,colonNb=1)  # 读取valid的数据，做相应后处理，返回一个dictionary
+
+    Ux_bulk_Dai=0.3
+	ax1.plot(db_1d_map2['rByD'],db_1d_map2['mean']/Ux_bulk_Dai,label='mapped-2',linewidth=2) # 画图，x轴为rByD，y轴为平均值，无量纲化显式出现
+#   ...
+
+#   reference plot
+    x1,y1 = rdb.Dai_thesis.Fig4p9a('EAU')  # 嵌套关系表示这里画的是Dai_thesis里面图Fig4.9(a)里面EAU这条线
+    ax1.plot(-x1+0.5, y1, label='Dai-2', marker='s', markerfacecolor='none', linewidth=2) # 在同一幅图里面画上对照数据
+#	...
+#	...
+
+main() # 执行main函数
+
+
+# 再看看 parameters_T_RES1d_MethodMapped_subMethod_NearestFace.py
+
+# physical parameters
+
+physics={
+        'R':0.004,
+        'nu':1.0e-6,
+        'uTau':0.0473
+        }
+
+# output of sample utility
+
+sampling={
+        'raw_sample_size':160,
+#        'dataShape':(199,4)     # uniform   # 这里展示了这个后处理过程的复杂性:
+                                             # 因为OpenFOAM sample sets操作后的数组用不同mode输出的数据长度不同
+#        'dataShape':(188,4)     # face 3    # 例如: uniform 和 face 两个mode下输出的长度不同
+        'dataShape':(195,4)     # face 2     # 在同一mode下不同的地方进行sample操作也可能得(对于复杂的几何外形的算例，网格在空间不均匀，换个sample的位置，几乎一定会变)的不同长度的数据，例如这里的 face 1,2,3
+#        'dataShape':(195,4)     # face 1    # 为何要确定长度？因为如果做空间统计（这个例子是时间，只要网格不变，sets不变那数据长度就不变），比如在周期条件的圆管流动里，里面沿着半径方向取一系列数学上有对称性的sets，然后想求对于sets的平均（即空间平均），每个sets在这里对应一个数据文件。这时候即使是相当规则的网格（butterfly分成5块），我的测试结果是:这一系列看起来数学上完全对称的sets有时候也会出现个别的特例（要么输出数据长度为0，要么输出数据跟大部分的shape不同，OpenFOAM当然不会报错警告你，所以我自己建立了一个检查机制，这样呢就需要一个目标shape和读取实际数据shape的对照的过程，这样每次后处理我就知道是否有exception。在这里，通过这样一个dictionary完成了参数parameters['sampling']['dataShape']的传递）
+        }
+
+# data entry parameters
+
+dataEntry={
+        'startTime':5.5,  # KinecticEnergy stationary
+        'endTime':7.2,
+        'chunkStep':50,
+        'NbOfFiles':171,
+        'path':"/store/caseByGeometry/T/new-mesh/pointwise/postProcessing/1d_mapped_NearestFace",
+        }
+
+parameters={
+        'physics':physics,
+        'sampling':sampling,
+        'dataEntry':dataEntry,
+        }
+
+```
