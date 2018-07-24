@@ -35,7 +35,7 @@ $ pip install --no-binary=h5py h5py --user # no-binary 版本
 ```
 
 ## anaconda
-anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5），就`h5py`来说，pip网上的资料还是多些。
+anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5，按照[要求](https://bitbucket.org/lesituu/timevaryingmappedhdf5fixedvalue)编译：要注意Make/options里面通过HDF5_DIR而不是CPATH和LD_LIBRARY_PATH来找，且在环境中设置不够，需要写入到Make/options里面`HDF5_DIR=$HOME/.local/easybuild/software/HDF5/1.8.17-foss-2016a`，这里的HDF5用easybuild安装，跟使用的OpenFOAM/2.3.1-foss-2016a匹配），就`h5py`来说，pip网上的资料还是多些。
 
 # IDE
 我在windows和linux下也都有anaconda，主要用在包里的spyder，可以实时查看数组变量（函数内部的变量在IDE里面查看不了，因为没有暴露在当前执行脚本的环境中），这在python学习初期很有用，在初期学习中可以有意识地不写函数，这样所有的变量都在可追溯的`Variable explorer`里面便于实时查看。想要查看某变量的类型，在里面集成的ipython console通过`type(variable)`输出即可。   
