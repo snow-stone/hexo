@@ -22,3 +22,4 @@ foamToVTK -cellSet $setName -latestTime           # 需有时间目录
 ```
 
 ![](topoSet_T.png)
+图里彩色部分就是topoSet选定的区域，透明部分是网格整体
