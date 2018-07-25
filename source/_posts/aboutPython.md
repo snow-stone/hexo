@@ -43,13 +43,13 @@ $ ipython
 In [1]: import sphinx
 
 In [2]: sphinx.__path__
-Out[2]: ['/home/hluo/bin/anaconda2/lib/python2.7/site-packages/Sphinx-1.4.1-py2.7.egg/sphinx']                  # 把库放在了$HOME/bin/anaconda2
+Out[2]: ['/home/hluo/bin/anaconda2/lib/python2.7/site-packages/Sphinx-1.4.1-py2.7.egg/sphinx']     # 把库放在了$HOME/bin/anaconda2
 In [3]: import numpy as np
 
 In [4]: np.__path__
 Out[4]: ['/home/hluo/.local/lib/python2.7/site-packages/numpy'] 
 ```
-为啥两个库存放的地方不同？按理说这是pip安装的目录(见下文)，我肯定之前干了什么然后失忆了，促成了此“姻缘”。。总之我在尝试安装h5py的时候遇到了各种问题，最终因为盘根错节根本厘不清！所以其实每次重新安装都有“做得更好”的可能，前提是厘清楚，然后养成好的习惯在使用的时候用哪一个就哪一个，切忌同时使用pip和anaconda。"一个程序就做一件事情，然后把它做好"，身边的那些计算机牛人们说过的话哈，引申一下受用了。
+为啥两个库存放的地方不同？按理说这是pip安装的目录(见下文)，我肯定之前干了什么然后失忆了，促成了此“姻缘”。。总之我在尝试安装h5py的时候遇到了各种问题，最终因为盘根错节根本厘不清！想搞清楚？重装吧。其实每次重新安装都有“做得更好”的可能，前提是厘清楚，然后养成好的习惯在使用的时候用哪一个就哪一个，切忌同时使用pip和anaconda。`一个程序就做一件事情，然后把它做好`，身边的那些计算机牛人们说过的话哈，引申一下受用了。
 
 ## pip
 实验室哥们推荐我就用pip，他给我的使用建议：   
@@ -260,11 +260,11 @@ def main():
 #   plot my data
 #   ...
 #   这里通过ps_map这个库，去相应路径找待处理的数据(例如OpenFOAM sample的结果)
-    l_1d_map2 = tsR.pre_check(ps_map.parameters,"Dai_lines_typeFace_cell-2")       # precheck检查数据是否valid （上面在dataShape处有解释）
+    l_1d_map2 = tsR.pre_check(ps_map.parameters,"Dai_lines_typeFace_cell-2")       # precheck检查数据是否valid （上面在dataShape处有解释），返回valid数据的路径
     db_1d_map2 = tsR.process(ps_map.parameters,validDataList=l_1d_map2,colonNb=1)  # 仅读取valid数据，做相应后处理，返回一个dictionary
 
     Ux_bulk_Dai=0.3
-    ax1.plot(db_1d_map2['rByD'],db_1d_map2['mean']/Ux_bulk_Dai,label='mapped-2',linewidth=2) # 画图，x轴为rByD，y轴为平均值，无量纲化显式操作
+    ax1.plot(db_1d_map2['rByD'],db_1d_map2['mean']/Ux_bulk_Dai,label='mapped-2',linewidth=2) # 从dictionary中取出相应数据画图，x轴为rByD，y轴为平均值，无量纲化显式操作
 #   ...
 
 #   reference plot
@@ -281,6 +281,7 @@ main() # 执行main函数
 
 
 # Debug
+## 缩进
 文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
 ```bash
 $ python -t script.py
