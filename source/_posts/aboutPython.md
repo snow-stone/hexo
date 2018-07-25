@@ -5,8 +5,51 @@ tags:
 ---
 
 # 环境
-都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头 
+都说python是很棒的语言，入门学习曲线可以说是相当亲民，但各种环境的“崎岖”让人望而却步，我到底应该用pip呢还是anaconda这样的问题让人挠头，见图便知。而且easybuild也依赖于python，用easybuild还可以（自动搜寻依赖关系）安装各种版本的python，安装相应的python库，配置相应的`清晰干净`的python环境，尤其在多用户高性能计算机群上广泛使用。而我需要管理手头多个版本的OpenFOAM和与它们依赖的库（其实也就mpi和scotch）：Modules工具不是牛刀，"模块化的环境"不仅让工作环境清爽整洁、条理清楚，还可以不费劲地将自己熟悉的整个工作环境在另一台机器上复现出来。
 ![](pythonEnv.png)
+所以我手头与python依赖的环境有：
+1. Linux CentOS 系统自带 /usr/bin/python
+2. easybuild (仅基于1来安装)
+3. /usr/bin/ipython
+4. /usr/bin/pip
+5. anaconda
+
+我要使用easybuild安装的module的时候用这个alias：
+```bash
+alias Easybuild='EASYBUILD_PREFIX=$HOME/.local/easybuild; \
+                 module use $EASYBUILD_PREFIX/modules/all; \
+                 module load EasyBuild; \
+                 EASYBUILD_MODULES_TOOL=EnvironmentModules'
+```
+也就是说默认不加载easybuild的环境，为何？
+```bash
+$ echo $PYTHONPATH
+
+$ Easybuild
+$ echo $PYTHONPATH
+/home/hluo/.local/easybuild/software/EasyBuild/3.2.1/lib/python2.7/site-packages
+```
+看到图里面右上角那个至少有三个箭头朝外的环境变量了吗？就是它。而anaconda有它自己一套的环境变量:
+```bash
+$ Anaconda                  # 加载anaconda环境
+$ which python
+~/bin/anaconda2/bin/python
+$ which ipython
+~/bin/anaconda2/bin/ipython
+$ which pip
+~/bin/anaconda2/bin/pip     # 是不是开始复杂起来了。。
+
+$ ipython
+In [1]: import sphinx
+
+In [2]: sphinx.__path__
+Out[2]: ['/home/hluo/bin/anaconda2/lib/python2.7/site-packages/Sphinx-1.4.1-py2.7.egg/sphinx']                  # 把库放在了$HOME/bin/anaconda2
+In [3]: import numpy as np
+
+In [4]: np.__path__
+Out[4]: ['/home/hluo/.local/lib/python2.7/site-packages/numpy'] 
+```
+为啥两个库存放的地方不同？按理说这是pip安装的目录(见下文)，我肯定之前干了什么然后失忆了，促成了此“姻缘”。。总之我在尝试安装h5py的时候遇到了各种问题，最终因为盘根错节根本厘不清！所以其实每次重新安装都有“做得更好”的可能，前提是厘清楚，然后养成好的习惯在使用的时候用哪一个就哪一个，切忌同时使用pip和anaconda。"一个程序就做一件事情，然后把它做好"，身边的那些计算机牛人们说过的话哈，引申一下受用了。
 
 ## pip
 实验室哥们推荐我就用pip，他给我的使用建议：   
