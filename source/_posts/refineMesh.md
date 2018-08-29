@@ -15,8 +15,8 @@ tags:
 ```bash
 #!/bin/bash
 
-topoSetDict=system/topoSetDict                    # 环境变量
-setName=branch_Port2_5D_1
+topoSetDict=system/topoSetDict                    
+setName=branch_Port2_5D_1                         # 一个topoSetDict对象，取名branch_Port2_5D_1
 
 topoSet -dict $topoSetDict/$setName > log.topoSet # 写入到constant/polyMesh/sets/{branch_Port2_5D_1  nonOrthoFaces  refinedCells}
 
@@ -30,7 +30,7 @@ foamToVTK -cellSet $setName -latestTime           # 将OpenFOAM数据格式转�
 #!/bin/bash
 
 checkMesh > log.checkOrgMesh
-setToRefine=branch_Port2_5D_1
+setToRefine=branch_Port2_5D_1                     # 一个refineMeshDict对象，取名branch_Port2_5D_1
 
 refineMeshDict=system/refineMeshDict
 
@@ -48,4 +48,4 @@ sourcedir=some/source/case/with/original/mesh/and/field/data/we/are/mapping
 
 mapFields $sourcedir -case . -noFunctionObjects -fields '(U p)' -sourceTime '7' -targetRegion region0 > log.mapFields_7 2>&1
 ```
-在target case里面一定要设置好mapFieldsDict，因为这里我选择不用consistent（虽然按照OpenFOAM说明geoemetry和BC都对应一模一样，按理可以尝试）。由于这个操作串行费内存且费时间而且可能在最后时刻幺蛾子，所以建议是先用网格较少的source和target来尝试，排除bug，然后根据checkList来保障每一步的可靠性。有尝试过在实验室机群上的单节点大内存单核上跑，但因为我本地的工作站cpu还更好，测试的结果是在内存允许的情况下使用工作站来进行这个操作。当然，手头刚拿到[occigen](https://www.top500.org/list/2018/06/?page=1)的计算资源，直接在登陆节点(interactively)对一个一千万网格算例做240个核的decomposePar效率非常高，三分钟就完成，希望mapFields也很快！
+在target case里面一定要设置好mapFieldsDict，因为这里我选择不用consistent（虽然按照OpenFOAM说明geoemetry和BC都对应一模一样，按理可以尝试）。由于这个操作串行费内存且费时间而且可能在最后时刻幺蛾子，所以建议是先用网格较少的source和target来尝试，排除bug，然后根据checkList来保障每一步的可靠性。有尝试过在实验室机群上的单节点大内存单核上跑，但因为我本地的工作站cpu还更好，测试的结果是在内存允许的情况下使用工作站来进行这个操作。当然，手头刚拿到[occigen](https://www.top500.org/list/2018/06/?page=1)的计算资源，直接在登陆节点(interactively)对10M网格算例做240个核的decomposePar效率非常高，三分钟就完成，希望mapFields也很快！自答：事实是occigen做一个从1.5M到10M网格的mapFields也要整整1h。验证了那句话“愿望很美好，现实很骨感“。
