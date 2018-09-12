@@ -6,7 +6,7 @@ tags:
 
 # 常用的object
 
-**timeSelector** : 通常以 -time 起，后接 `:500,1200:1300,3000:`
+**timeSelector** : 通常以 -time 起，后接 `':500,1200:1300,3000:'`
 
 **args** : argList类 —— argument list. 构造函数对应 `#include "setRootCase.H"`
 
