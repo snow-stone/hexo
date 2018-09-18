@@ -45,7 +45,10 @@ tags:
 4.  system/controlDict : if the startTime corresponds to initial time dir
 5.  serial run check
 6.  decomposePar       : need to verify if the time dir is well decomposed
-7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免有相关输出到`*_mpi.%j.err`前面已经做过这里就不再需要module load
+7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
+a)  注意 --exclusive 是否必要
+b)  注意 --mem 是否足够
+c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有
 8.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
 9.  run on test if possible
 10. run simu
@@ -93,3 +96,97 @@ c) sets或者surfaces的输出文件名都可以个性化编辑
 3. sample
 
 注：检查不出sample是否有结果？`rm -rf postProcessing ; sample` 这样会比较明确
+
+## 机群相关
+### newton
+1. No `#SBATCH --exclusive` (if not necessary)
+2. Naming of the file with exactly 8 chars with `-2` indicates for example 2nd run. Ex : `p10D_gP5-2`
+3. consider remove `#SBATCH --mem-per-cpu=4000` because there are nodes which bigger memory available
+
+```bash
+#!/bin/bash
+# FILE : p10D_gP5-2
+
+#BATCH --job-name=MeshConvergence                    # Is this even useful ? SABTCH no?
+#SBATCH --output=job.%j.out
+#SBATCH --error=job.%j.err 
+#SBATCH --mail-user=haining.luo@doctorant.ec-lyon.fr
+#SBATCH --mail-type=ALL
+#
+#SBATCH --partition=mononode
+#SBATCH --mem-per-cpu=4000
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=16
+#SBATCH --cpus-per-task=1
+#SBATCH -t 1-00:00:00
+
+# number of simulation
+nos=2
+logFile=logSimulation$nos
+
+# 在newton上module purge load部分可以保留
+module purge
+# Opt/Debug mode on
+module load OpenMPI/1.6.5-GCC-4.8.3 ; \
+. /home/lmfa/hluo/LocalSoftware/OpenFOAM/OpenFOAM-2.3.x/etc/bashrc.Opt
+
+echo "NodeName = " $SLURMD_NODENAME >> $logFile
+echo "JobID = " $SLURM_JOB_ID >> $logFile
+
+mpirun -np 16 pimpleFoam -parallel >> $logFile
+```
+
+3. run mapFields need a big memory. Theres now a template for big-memory job. Especially, dont put `&` at the end of commands or mapFields will only last for 2s and theres no error message returned so could be confusing.
+
+```bash
+#!/bin/bash
+#
+##SBATCH --job-name=T-1b_mirrorMerge_mapped
+#SBATCH --output=job.%j.out
+#SBATCH --error=job.%j.err 
+#SBATCH --mail-user=haining.luo@doctorant.ec-lyon.fr
+#SBATCH --mail-type=ALL
+#
+#SBATCH --partition=test
+#SBATCH --mem=32000                  # asking for 32000Mb ~ 30Gb of memory 
+#SBATCH --nodes=1                    # 1 node
+#SBATCH --ntasks-per-node=1          # one task for one node
+##SBATCH --cpus-per-task=1           # one cpu per task
+##SBATCH -t 1:00:00
+
+# number of simulation
+nos=1
+logFile=logSimulation$nos
+
+module purge
+# debug mode on
+module load OpenMPI/1.6.5-GCC-4.8.3 ; \
+. /home/lmfa/hluo/LocalSoftware/OpenFOAM/OpenFOAM-2.3.x/etc/bashrc.Opt
+
+# run solver 
+#decomposePar  # Do this manually
+
+echo "NodeName = " $SLURMD_NODENAME >> $logFile
+echo "JobID = " $SLURM_JOB_ID >> $logFile
+
+#mpirun -np 64 icoFoam -parallel >> $logFile
+
+sourcedir=/home/lmfa/hluo/LocalSoftware/OpenFOAM/hluo-2.3.x/run/1b_mirrorMerge_mapped_NearestFace
+mapFields $sourcedir -case . -noFunctionObjects -fields '(U p)' -sourceTime '6.01' -targetRegion region0 > logMapFields_new 2>&1  # No "&" here
+```
+
+Here maybe a reason that zaurak well perform likely 2 times better than cpus on newton when the constraint on memory is not there.
+
+```bash
+hluo@zaurak $ cat /proc/cpuinfo | grep model
+#...
+model name	: Intel(R) Xeon(R) CPU E5-1620 v4 @ 3.50GHz
+
+hluo@compil-haswell $ cat /proc/cpuinfo | grep model
+#...
+model name	: Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz
+
+hluo@visu $ cat /proc/cpuinfo | grep model
+#...
+model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
+```
