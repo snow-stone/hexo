@@ -35,36 +35,47 @@ tags:
 - [ ] checkMesh
 - [ ] serial run to check
 
-## General Setting up for OpenFOAM
+## Complete Setting up for OpenFOAM
 
-mesh (transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)])
+env                : purge modules ; set Foam environment
+mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]
 initial condition (mapFields) and BC (changeDictionary)
 topoSet
 system/controlDict : if the startTime corresponds to initial time dir
-check serial run : if not passed, turn back
-decomposePar : need to verify if the time dir is well decomposed
-job submission file : check node, cpu, time(estimation), np, nos
-verify logFile. Don't overwrite. Make sure system/controlDict* correspond to the nos
-
+serial run check
+decomposePar       : need to verify if the time dir is well decomposed
+job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免有相关输出到`*_mpi.%j.err`前面已经做过这里就不再需要module load
+logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
 run on test if possible
 run simu
-
+if any monitoring script, launch
 
 ## inletBC mapped from class "mappedFixedValueFvPatchField"
 
 Generate mesh and checkMesh
 Modify constant/polyMesh/boundary
-Modify BCs in startTime/U 
+Modify BCs in startTime/U (如果startTime 非空)
 
 
 ## mapFields
 
-如果不是consistent，目标case里面要编辑好文件mapFieldsDict
-确认目标case里面startTime，它会是mapFields完成后的时间目录
-mapFields $source -case $target -noFunctionObjects -fields '(U p)' -sourceTime '7' > log.mapFields_7
-检查mapFields是否无误地完成：检查log；检查目标case里面是否有'-nan'；回避`empty`的BC（有试过，会有报错）； 如果源case里面constant/polyMesh/boundary里面有`mappedPatch`，如果目标case里面没有相应的BC设配置，可能会在mapField最后写入数据的时候报错后果是例如U文件的写入遇到错误而被跳过]
-把映射后的场的BC由`calculated`改成相应的物理BC，这样才可以续算，这个步骤可以通过changeDictionary来完成
-尝试串行运行case纠错
+```bash
+#!/bin/bash
+source=/some/case/to/be/mapped
+#taget 这里target就是"."
+
+mapFields $sourcedir -case . -noFunctionObjects -fields '(U p T)' -sourceTime '8' -targetRegion region0 > log.mapFields_8 2>&1
+```
+
+0. 回避  
+a) $source里`empty`的BC（有试过，会有报错）  
+b) 如果$source里面constant/polyMesh/boundary里面有`mappedPatch`，且如果$target里面没有相应的BC配置，可能会在mapFields最后写入数据的时候报错后果是例如U文件的写入遇到错误而被跳过].在$source有`mappedPatch`的情况下，$target里面constant/polyMesh/boundary也得改成相应BC  
+1. 如果不是consistent，目标case里面要编辑好文件mapFieldsDict
+2. 确认$source里面startTime，它会是mapFields完成后的时间目录，输出格式改为ascii
+3. mapFields (等待时间可能很长)
+4. 手动检查mapFields是否无误地完成：检查目标case里面是否有'-nan'
+5. 把映射后的场的BC由`calculated`改成相应的物理BC，这样才可以续算，这个步骤可以通过changeDictionary来完成
+6. 串行试运行
 
 ## reconstructPar
 
@@ -73,16 +84,18 @@ mapFields $source -case $target -noFunctionObjects -fields '(U p)' -sourceTime '
 
 ## sample
 
-编辑sampleDict：可能需要用python脚本来写入一系列sets的描述：例如160条线就不能全部手写
-考量命名
-sample -dict system/sampleDictName -time '109.9'
+```bash
+#!/bin/bash
+sampleDict=system/sampleDict
 
+sample -dict $sampleDict/sets/Dai_lines_5cutsBetween2and3_typeFace_cell -time '8:10' > log.sample-Dai_lines_5cutsBetween2and3_typeFace_cell 2>&1
+```
 
-## sampleDict
+1. 编辑sampleDict：可能需要用python脚本来写入一系列sets的描述，例如160条线就不能全部手写  
+a) 检查`fields`，如果写得不对，OpenFOAM并不会报错  
+b) 检查是否有header（没有header会有报错），`object`填`sampleDict`  
+c) sets或者surfaces的输出文件名都可以个性化编辑
+2. 重命名sampleDict，是sets放目录$sampleDict/sets，是surfaces放目录$sampleDict/surfaces
+3. sample
 
-检查`fields`，如果写得不对，OpenFOAM并不会报错
-检查是否有header（没有header会有报错），`object`填`sampleDict`
-
-sets或者surface的命名都可以个性化
-命名方式lines_complement_typeUniform_cell-155 : -155 is better for recognizing the number. lines_complement_typeUniform_cell works as an input for postProcessing python script to make sampleDict sample result and postProcessing python script consistent.
-Not sure of sample results? rm -rf postProcessing and see if there is any ouput.
+注：检查不出sample是否有结果？`rm -rf postProcessing ; sample` 这样会比较明确
