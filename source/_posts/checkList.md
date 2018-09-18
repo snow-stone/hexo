@@ -46,8 +46,8 @@ tags:
 5.  serial run check
 6.  decomposePar       : need to verify if the time dir is well decomposed
 7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
-a)  注意 --exclusive 是否必要
-b)  注意 --mem 是否足够
+a)  注意 `--exclusive` 是否必要
+b)  注意 `--mem` 是否足够
 c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有
 8.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
 9.  run on test if possible
