@@ -18,9 +18,7 @@ tags:
 
 记录“已知在某个步骤上会出现的问题”，然后据此设计check-list来规避已知问题，这是高于平时“工作的自己”层次的思维方式。工作的时候我要debug，要进入多层嵌套的代码，是细节的把控，而check-list让我跳出来，让我看到自己在地图的哪个地方，在某某步骤上的经验和教训是什么，接下来可能的问题是什么，问自己是主要矛盾吗，时间成本会是多少，应该如何决策，这是**做决策**的思维层次([原则](https://book.douban.com/subject/27608239/))。为何需要决策而不是单纯地使用？因为没有“机器”，或者说没有包装好的GUI会告诉我“现在到了哪一步，下一步需要做什么”。
 
-总结一下  
-劣：相较于fluent，OpenFOAM的劣势是文本文件之间的自然逻辑没有GUI来完成，优势是对一个功能如果充分了解，就可以有很大自由度进行操作（可以按照上面说到的check-list来完成步骤，实现步骤的“自动化”）,因而劣势可以弥补
-优：OpenFOAM最大的优势还是完全开源，只有不懂的地方才是黑箱，经手的所有步骤都在掌握，所有的变量都在掌握
+总结一下：相较于fluent，OpenFOAM的劣势是文本文件之间的自然逻辑没有GUI来完成，优势是对一个功能如果充分了解，就可以有很大自由度进行操作（可以按照上面说到的check-list来完成步骤，实现步骤的“自动化”）,因而劣势可以弥补; OpenFOAM最大的优势还是完全开源，只有不懂的地方才是黑箱，经手的所有步骤都在掌握，所有的变量都在掌握
 
 要知道，检查表可繁可简，为节约时间成本阿波罗13号出事之后检查表都被大规模简化，也就是“跳步”，而明白跳步的风险是简化的必须。所以检查表到底应该多繁多简，视情况而定。我根据自己的经验制作了一系列检查表，有的是配置算例流程，有的是关于某一个utility，还有NotToDo-list，总之对我怎么有用怎么来，还不止OpenFOAM，因为尤其跟CAE相关的软件都很大型，按钮特别多，记忆是不可靠的。加上如果在不同的计算机群上面计算，队列是不一样的，对用户的要求是不一样的（比如occigen上面对文件个数要求特别苛刻），用户的需求是不一样的（比如考虑到priority的问题，我又时候可能会选择提交一个计算时间较短的算例），情形很多，未必都需要检查表化，但按照自己的逻辑记录下要点，比起每次决策的时候再去网站上找零散的信息来得更高效。
 
@@ -40,18 +38,18 @@ tags:
 
 ## OpenFOAM simulation 完整流程
 
-0. env                : purge modules ; set Foam environment
-1. mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]
-2. initial condition (mapFields) and BC (changeDictionary)
-3. topoSet
-4. system/controlDict : if the startTime corresponds to initial time dir
-5. serial run check
-6. decomposePar       : need to verify if the time dir is well decomposed
-7. job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免有相关输出到`*_mpi.%j.err`前面已经做过这里就不再需要module load
-8. logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
-9. run on test if possible
-10.run simu
-11.if any monitoring script, launch
+0.  env                : purge modules ; set Foam environment
+1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]
+2.  initial condition (mapFields) and BC (changeDictionary)
+3.  topoSet
+4.  system/controlDict : if the startTime corresponds to initial time dir
+5.  serial run check
+6.  decomposePar       : need to verify if the time dir is well decomposed
+7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免有相关输出到`*_mpi.%j.err`前面已经做过这里就不再需要module load
+8.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
+9.  run on test if possible
+10. run simu
+11. if any monitoring script, launch
 
 ## mapFields
 
