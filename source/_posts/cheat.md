@@ -26,5 +26,5 @@ paraview中有这个选项，然而，经历reconstructPar或者decomposePar后B
 
 上图，这个就是我并行120个核算出来之后想都没想就reconstructPar的效果，一脸懵
 ![reconstructPar之后](paraRun.png)
-但把原数据也就是放在processor*里面的数据用paraview来看的时候就变成了，用`numberOfSubdomains=120`再重新decomposePar也是一样的效果
+但把原数据也就是放在processor*里面的数据用paraview来看的时候就变成了下图，用`numberOfSubdomains=120`再重新decomposePar也是一样的效果
 ![decomposedCase](serialRun.png)
