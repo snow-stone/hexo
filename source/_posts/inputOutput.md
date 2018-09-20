@@ -15,6 +15,8 @@ tags:
 另外[openfoam-plus_1712和openfoam5](https://www.openfoam.com/releases/openfoam-v1712/parallel.php)提供了一种直接输出一个整体流场`U, p, phi`的方式。但具体能否在较早版本中兼容使用待观察
 
 # binary or ascii
-模拟的数据输出可以选择，各有优劣：binary数据存储体积更小，推荐在simu中间使用；在初始场中推荐使用ascii，因为万一要改边界条件binary格式不是那么好下手，再者openfoam支持一个simu里面两种格式的储存，utility在读数据的时候包括solver在读数据的时候都是要读头文件以相应格式读取。  
+模拟的数据输出可以选择，各有优劣：binary数据存储体积更小，推荐在simu中间使用；在初始场中推荐使用ascii，因为万一要改边界条件binary格式不是那么好下手(vimdiff或者meld都对ascii支持更好)，再者openfoam支持一个simu里面两种格式的储存，utility在读数据的时候包括solver在读数据的时候都是要读头文件以相应格式读取。
 
-binary或者ascii，如何在二者中转换？比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii
+binary或者ascii，如何在二者中转换？  
+复杂解：比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii
+简单解：foamFormatConvert，用system/controlDict里面的格式来写输出（不过这会overwrite原数据）
