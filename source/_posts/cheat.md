@@ -14,3 +14,5 @@ tags:
 
 # 如何被OpenFOAM骗
 
+## reconstructPar与decomposePar
+这俩不互为反函数，如果要用这种方式完成binary和ascii的转换，一定double check，尤其BC
