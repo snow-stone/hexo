@@ -44,7 +44,7 @@ tags:
 3.  topoSet
 4.  system/controlDict : if the startTime corresponds to initial time dir
 5.  serial run check
-6.  decomposePar       : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed
+6.  decomposePar -time 'time2Decomp' : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed
 7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
 a)  注意 `--exclusive` 是否必要
 b)  注意 `--mem` 是否足够
