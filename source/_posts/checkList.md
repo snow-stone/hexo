@@ -53,6 +53,7 @@ c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的
 9.  run on test if possible
 10. run simu
 11. if any monitoring script, launch
+12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能BC上的value会被篡改
 
 ## mapFields
 
