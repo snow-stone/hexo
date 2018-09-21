@@ -28,3 +28,6 @@ paraview中有这个选项，然而，经历reconstructPar或者decomposePar后B
 ![reconstructPar之后](paraRun.png)
 但把原数据也就是放在processor*里面的数据用paraview来看的时候就变成了下图，用`numberOfSubdomains=120`再重新decomposePar也是一样的效果
 ![decomposedCase](serialRun.png)
+
+## 同一个类的不同变种编译为不同名字的lib
+如上，如果想要将多个lib混用在一个case里面，在system/controlDict里面都加入lib是必须的，但其实这样不行，做不到混用。如何做到呢？需要修改类的名字，并与makePatchTypeField(fvPatchVectorField, pVFvPatchVectorField2Dpf_Port1)这个macro function对应，这样不仅lib名字不同其实里面的类也不同，这样就可以混用了。
