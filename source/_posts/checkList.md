@@ -30,6 +30,8 @@ tags:
 
 ## Pointwise export
 
+- [ ] Select Solver : OpenFOAM 3D
+- [x] Set BC types
 - [x] Select blocks
 - [ ] Export CAE
 - [x] Rescale to meter : transformPoints -scale ’(0.001 0.001 0.001)’
