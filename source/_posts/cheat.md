@@ -17,7 +17,7 @@ tags:
 ## reconstructPar与decomposePar
 这俩不互为反函数，如果要用这种方式完成binary和ascii的转换，一定double check BC，因为BC可能被改写
 
-一句话：reconstructPar 一定要看好BC
+一句话：reconstructPar/decomposePar 一定要看好BC
 
 ## reconstructed case or decomposed case
 paraview中有这个选项，然而，经历reconstructPar或者decomposePar后BC可能被篡改，所以单纯看边界的话有可能会被吓倒在地，怎么可能！同一个时间步decompose情况下用paraview看BC上的值好好的，结果reconstructPar之后paraview一看……面目全非！这种差异在numberOfSubdomains更容易出现(例如120)，而设置成4就有可能没问题，可能可以算作bug
