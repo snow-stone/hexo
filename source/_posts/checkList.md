@@ -60,7 +60,7 @@ c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的
 ## occigen 使用手册
 
 0.  openfoam env : 如果用python来做slurm多个连续任务提交，必须在提交前做好这一步；也就是说如果忘记了提交slurm会在第一个job报错，然后你发现slurm找不到`mpirun`，这时候补上再重新提交，新的提交第一个job能通过，但第二个job仍然会报错`找不到mpirun`；似乎slurm的默认环境是你登陆某login节点后第一次提交任务的环境，也就是说：login之后得首先做这个事情再提交任何算例(虽然直接使用`sbatch **`倒是不影响，但对通过python来提交的连续算例将会是致命的）
-1.  nohup python submit.py > log.submit : 提交job，通过`squeue`的返回值**离散地**监控job状态，通过返回值来检验一个算例完成后(这里还有个bug)修改`system/controlDict`里面`startTime`和`endTime`用于自动提交下一个算例(限制：simuLog不停地被改写，应该留下来才好)；log取好名字以方便查看
+1.  nohup python submit.py > log.submit : 提交job，通过`squeue`的返回值**离散地**监控job状态，通过返回值来检验一个算例完成后(这里还有个bug)修改`system/controlDict`里面`startTime`和`endTime`用于自动提交下一个算例(限制：simuLog不停地被改写，应该把每个job的log都留下来才好)；log.submit取好名字以方便查看
 2.  nohup python watchDog.py > log.watchDog : 设置一个运行最大时长，在这个时间内用`reconstructPar`来保留计算输出数据，删除`processor*`里面已经`reconstructPar`完成地时间步大幅度削减文件个数，保证不超过scratch的限额；log取好名字以方便查看
 3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
 4.  检查`log.submit`，查看jobs的情况
