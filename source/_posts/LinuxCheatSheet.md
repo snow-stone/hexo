@@ -23,7 +23,7 @@ $ rsync --dry-run -av --progress sourcefolder /destinationfolder --exclude thefo
 # show progress
 $ rsync -av --progress sourcefolder /destinationfolder --exclude thefoldertoexclude
 # rsync multiple files at one line, passwd input only once
-$ rsync -av remote:dirToCase/{0.165,0.18,0.195,0.21,0.225} local/dir/
+$ rsync -av remote:dirToCase/{0.165,0.18,0.195,0.21,0.225} /some/local/dir/
 
 
 # mkdir / rm / regular expressions / using {} for multiple-file usage
@@ -87,5 +87,10 @@ $ file *.a         ar archive
 $ dos2unix fileName
 
 # 多行选中
-ctrl + v (visual block) -> use cursor (h j k l) to move and select a multi-line-block -> s (insert) -> input "#" -> Esc -> all select block is then replaced by "#"
+ctrl + v (visual block) -> 
+use cursor (h j k l) to move and select a multi-line-block -> 
+s (insert) -> 
+input "#" -> 
+Esc -> 
+all select block is then replaced by "#"
 ```
