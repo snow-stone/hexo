@@ -41,20 +41,23 @@ tags:
 ## OpenFOAM simulation 完整流程
 
 0.  env                : purge modules ; set Foam environment
-1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]
+1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]；格式上mesh可以变成binary(`foamFormatConvert -constant`)，但OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换
+1.  compile BC         : 如果要用一个新的BC
 2.  initial condition (mapFields) and BC (changeDictionary)
 3.  topoSet
 4.  system/controlDict : if the startTime corresponds to initial time dir
 5.  serial run check
-6.  decomposePar -time 'time2Decomp' : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed
-7.  job slurm file     : name it right ; check node, cpu, time(estimation) ; variables : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
+6.  decomposePar -time 'time2Decomp' : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed. 首先完成的是constant的划分，随后才是`time2Decomp`的划分
+7.  BC                 : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但`member`一定要都在)
+7.  job slurm file     : `--job-name` 8个字符 ; 队列, 节点数，每个节点task数，总task数（可以小于`节点数*单个节点task数`），预计计算长 ; 如果有 bash variable : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
 a)  注意 `--exclusive` 是否必要
 b)  注意 `--mem` 是否足够
 c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有
 8.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
 9.  run on test if possible
-10. run simu
-11. if any monitoring script, launch
+10. run simu/run jobs via python
+11. if fisrt run, touch userDefinedLog/removedTimes
+11. if any monitoring script, launch : 一定检查moniter函数的参数
 12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能BC上的value会被篡改
 
 ## occigen 使用手册
