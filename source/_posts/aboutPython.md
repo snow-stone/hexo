@@ -294,3 +294,7 @@ $ cat -A script.py
 ```
 ## spyder
 有次遇到了`TypeError: 'str' object is not callable`，找了半天都没有头绪，结果重启spyder就好了。说明有些错，真不简单，试试重启大法。
+
+
+# python提交算例到机群
+而你又没有pySlurm的时候.....
