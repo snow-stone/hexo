@@ -26,22 +26,22 @@ tags:
 zaurak :   
 +++ 固态硬盘IO速度快效率高，包括查看文件大小也是速度奇快   
 `/store/`   
-- -  容积小[2TB]   
+--  容积小[2TB]   
 `/home/`   
-- -  容积小[170G]
+--  容积小[170G]
 
 visu/newton :   
 ++ 用于读写各种操作的内存很足，当zaurak内存不够用则考虑开始启用   
-- - 硬盘IO太慢
+-- 硬盘IO太慢
 `$STORE`   
 ++ 硬盘存储空间足   
 ++ 跟zaurak之间传输速度（待估计）比较快   
 `$HOME`   
--  空间大小[2TB]
+--  空间太小[2TB]
 
 occigen :   
-- - `$STORE`[1.5TB]只支持`*.tar.gz`，只能暂时存储   
-- - `$SCRATCH`[4TB && fileNb 600000]   
+-- `$STORE`[1.5TB]只支持`*.tar.gz`，只能暂时存储   
+-- `$SCRATCH`[4TB && fileNb 600000]   
    `$HOME`基本不用
 
 
