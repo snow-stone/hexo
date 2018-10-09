@@ -103,7 +103,7 @@ volScalarField nu
 
 // 然后再赋值
 
-nu.internalField()=userCalcNu(strainRate);
+nu.internalField()=userCalcNu(strainRate); // 如果用strainRate.internalField()会有什么区别？编译倒是可以通过
 
 // 输出
 
