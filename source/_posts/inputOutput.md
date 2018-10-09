@@ -20,3 +20,93 @@ tags:
 binary或者ascii，如何在二者中转换？  
 复杂解且不完全：比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii，`internalField`的读写应该没问题，但是BC呢还是得check一下
 简单解且官方：foamFormatConvert，用system/controlDict里面的格式来写输出（不过这会overwrite原数据）,默认会将constant/polyMesh里面的数据也按照格式重写
+
+# 通过IOobject读入写出场
+
+## 读入
+
+```cpp
+
+volVectorField velocityField
+(
+    IOobject
+    (
+        velocityFieldName,
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ
+    ),
+    mesh
+);
+
+// 后面引用velocityField即可，注意这里只读了runtime.timeName()里面的，文件名为velocityFieldName这个文件
+
+```
+
+## 计算和输出（标准）
+
+```cpp
+
+volScalarField strainRate
+(
+   IOobject
+    (
+        "strainRate_"+velocityFieldName,
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    Foam::sqrt(2.0)*mag(symm(fvc::grad(velocityField))) // 这里就继承了量纲
+);
+
+```
+
+## 计算和输出（避开量纲）
+
+```cpp
+
+scalarField userCalcNu(scalarField strainRate) // 这里想要偷懒，全部无量纲
+{
+    scalar nuInf_ = 2e-6;
+    scalar nu0_   = 3e-4;
+    scalar k_     = 1;
+    scalar n_     = 0.326;
+    scalar a_     = 2.0;  // defaut BirdCarreau
+
+    return
+        nuInf_
+      + (nu0_ - nuInf_)
+        *pow(scalar(1) + pow(k_*strainRate, a_), (n_ - 1.0)/a_);
+}
+
+// 先初始化一个变量nu
+volScalarField nu
+(
+    IOobject
+    (
+        outputFieldName,
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+	//userCalcNu(strainRate) Not a volScalarField ! 如何由scalarField变成volScalarField??
+    mesh,
+    dimensionedScalar
+    (
+        outputFieldName,
+        dimless,                               // 续前面偷懒的地方，算个无量纲
+        scalar(0.)
+    )
+);
+
+// 然后再赋值
+
+nu.internalField()=userCalcNu(strainRate);
+
+// 输出
+
+nu.write();
+
+```
