@@ -97,7 +97,7 @@ volScalarField nu
     (
         outputFieldName,
         dimless,                               // 续前面偷懒的地方，算个无量纲
-        scalar(0.)
+        scalar(0.) // 很奇怪如果是vector这里可以用vector::zero，但scalar::zero就不行
     )
 );
 
@@ -108,5 +108,39 @@ nu.internalField()=userCalcNu(strainRate);
 // 输出
 
 nu.write();
+
+```
+
+## 计算一个跟壁面相关的场（也就是仅在边界上才有值）并输出
+可以参照wallShearStress，这样输出的场（yPlus也是类似）可以在paraview可视化，也许需要去掉`internal mesh`的勾选
+
+```cpp
+
+//初始化变量，依旧是volVectorField而不是什么boundaryField
+
+volVectorField wallShearStress
+(
+    IOobject
+    (
+        "wallShearStress",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector
+    (
+        "wallShearStress",
+        sqr(dimLength)/sqr(dimTime),
+        vector::zero
+    )
+);
+
+//赋值过程对着wallShearStress.boundaryField()赋值
+
+//输出过程
+
+wallShearStress.write();
 
 ```
