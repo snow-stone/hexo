@@ -144,3 +144,28 @@ volVectorField wallShearStress
 wallShearStress.write();
 
 ```
+
+### 初始化一个单位张量场
+
+```cpp
+
+volTensorField identity
+(
+   IOobject
+    (
+        "identity",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedTensor // dimensioned<tensor>
+    (
+        "identity",
+        dimless,
+        tensor::I
+    )
+);
+
+```
