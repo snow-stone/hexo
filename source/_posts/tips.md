@@ -74,3 +74,21 @@ forAll(mesh.boundaryMesh().names(), patchName)
 ...
 */
 ```
+
+## findPatchID
+通过字符串来找到一个patchList里面对应的patchID
+```cpp
+label patchID = mesh.boundaryMesh().findPatchID("walls"); 
+```
+
+## boundary value还是离网格最近的cell value?
+`U.boundaryField()[patchi]`这个是boundary value.`U.patchInternalField()`这是离boundary最近的cell些的U的cell value
+
+## faceCells
+cell到face是很自然的，因为：cell是什么？多个face闭合起来成为cell。那怎么反过来找呢？
+```cpp
+const fvPatchList& patches = mesh.boundary();
+
+patches[somePatch].faceCells[facei]; // 返回值就是patches[somePatch][facei]对应的唯一cell的cellID
+
+```
