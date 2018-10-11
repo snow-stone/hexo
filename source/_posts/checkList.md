@@ -45,7 +45,7 @@ tags:
 1.  compile BC         : 如果要用一个新的BC
 2.  initial condition (mapFields) and BC (changeDictionary)
 3.  topoSet
-4.  system/controlDict : if the startTime corresponds to initial time dir
+4.  system/controlDict : if the startTime corresponds to initial time dir, 保证startTime和endTime不相同，如果相同的话openfoam还不会报错，log的末尾仍旧是`Finalising parallel run`
 5.  serial run check
 6.  decomposePar -time 'time2Decomp' : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed. 首先完成的是constant的划分，随后才是`time2Decomp`的划分
 7.  BC                 : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但`member`一定要都在)
