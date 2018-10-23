@@ -51,4 +51,5 @@ tags:
 
 ```
 这里需要解释一下：新面1,2是由旧1,2生成，生成的条件有“类型，matchTolerance,neighbourPatch”，当新2还没有生成的时候怎么将新1与新2对应呢？当然，这里**如果**把第一个大括号当成了新1 patch的constructor，它将找不到新2的定义。不过回想一下，其实旧12和新12都是twin的关系，互相依赖，这样写并无道理，只是...程序具体怎么实现的就不知道了.   
-注：为了保证无误，新旧1和新旧2的名字没有取一样；想改成新旧一样？在这个流程的最后把constant/polyMesh/boundary里面改过来就好
+注：为了保证无误，新旧1和新旧2的名字没有取一样；想改成新旧一样？在这个流程的最后把constant/polyMesh/boundary里面改过来就好   
+注：createPatch在这里是由原先pointwise的twin domains/patches变成了新的cyclic patches，据此来看还有将patches变成一个patch的功能，或者将faceSet变一个patch
