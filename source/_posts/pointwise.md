@@ -11,7 +11,7 @@ tags:
 
 2. 按照pointwise基本流程导出网格文件，但设置BC的时候设置成`patch`而不是`cyclic`
 
-3. 设置`createPatchDict`来完成`patch`到`cyclic`的转换. createPatch 生成新的网格文件，-overwrite可以改写原先网格文件
+3. 设置`createPatchDict`来完成`patch`到`cyclic`的转换. createPatch 生成新的网格文件，-overwrite可以改写原先网格文件，副产物还有一系列`*.obj`文件
 
 ```cpp
 
