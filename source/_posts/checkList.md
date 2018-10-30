@@ -88,6 +88,41 @@ b) 如果$source里面constant/polyMesh/boundary里面有`mappedPatch`，且如�
 5. 把映射后的场的BC由`calculated`改成相应的物理BC，这样才可以续算，这个步骤可以通过changeDictionary来完成
 6. 串行试运行
 
+```bash
+# 一个长度为5D的圆管映射到一个长度为10D的圆管，inlet*完全对应
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      mapFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+patchMap        ( inlet0 inlet0         // Source 和 Target 都有的 patch
+                  inlet1 inlet1         // 且一一对应
+                  inlet2 inlet2
+                  inlet3 inlet3
+                  inlet4 inlet4 );
+
+cuttingPatches  ( wall                  // 剩下 wall patch 和 outlet*
+                  outlet0               // 此处为空->(U p)在 wall 和 oulet* 会出现异常大数甚至nan!!
+                  outlet1               // 只填 wall， wall上面插值没有异常大数出现
+                  outlet2               // 填上 wall patch 和 outlet*, outlet*都乖乖地保持了“最简单状态” (虽然U在 
+                  outlet3               // outlet*上面不应该是 uniform (0 0 0)，但毕竟是 type calculated
+                  outlet4 );
+
+// ************************************************************************* //
+```
+
 ## reconstructPar
 
 在reconstructPar -fields '(U p)'之后，reconstructPar -fields '(phi)'会将phi添加到对应的时间目录里面.
