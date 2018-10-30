@@ -16,6 +16,16 @@ $ ps -eaf | grep $USER
 $ nvidia-smi
 
 
+# screen
+# name a screen session
+$ screen -S someName
+# detache from screen
+Ctrl + A then D
+# see running screen
+$ screen -ls
+# re-attach to a screen
+$ screen -r ** 
+
 # rsync
 
 # --dry-run
