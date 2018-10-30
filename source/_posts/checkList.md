@@ -121,6 +121,34 @@ cuttingPatches  ( wall                  // 剩下 wall patch 和 outlet*
                   outlet4 );
 
 // ************************************************************************* //
+
+# 两个T型圆管，几何完全一样，但网格不同
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      mapFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+patchMap        ( Port1 Port1        
+                  Port2 Port2
+				  Port3 Port3
+				  wall  wall  );
+
+cuttingPatches
+();
+// ************************************************************************* //
+
 ```
 
 ## reconstructPar
