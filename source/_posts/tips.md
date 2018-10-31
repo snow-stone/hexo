@@ -103,4 +103,7 @@ const surfaceScalarField& phi = runTime.db().lookupObject<surfaceScalarField>("p
 
 // 在边界条件里面(fvPatchField)找db()
 this->db()
+// 再通过db()找计算time的值
+const scalar t = this->db().time().timeOutputValue()
+
 ```
