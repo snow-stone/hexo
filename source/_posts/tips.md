@@ -92,3 +92,15 @@ const fvPatchList& patches = mesh.boundary();
 patches[somePatch].faceCells[facei]; // 返回值就是patches[somePatch][facei]对应的唯一cell的cellID
 
 ```
+
+# 相互引用的数据
+```cpp
+// 通过U找mesh()
+const fvMesh & mesh  =  U.mesh();
+
+// 通过runTime(Foam::Time is an objectRegistry)找db()，通过db()找phi
+const surfaceScalarField& phi = runTime.db().lookupObject<surfaceScalarField>("phi"); // 能通过编译，但runTime能不能从objectRegistry找到是另一回事
+
+// 在边界条件里面(fvPatchField)找db()
+this->db()
+```
