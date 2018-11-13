@@ -14,6 +14,11 @@ tags:
 
 # 如何被OpenFOAM骗
 
+## probes
+OpenFOAM本身的probes如果刚好碰上网格边上会有warning   
+属于functionObjects，在simu的同时运行，如果想要postProcssing，用execFlow...，但是：需要在constrolDict里面加入,自己写的BC会有奇怪报错...   
+对策：用wyldckat写的，摘干净的最通用的ExecFunctionObjects，把所有的functionObject都放在system/system/controlDict.functions，这样就可以分开了
+
 ## reconstructPar与decomposePar
 这俩不互为反函数，如果要用这种方式完成binary和ascii的转换，一定double check BC，因为BC可能被改写
 
