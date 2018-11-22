@@ -72,6 +72,7 @@ c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的
 
 此为大坑，尤其是OF-2.x的版本，存在一些bug(不是fatal，但会让mapFields运行得无比慢，比fatal还可恶。按照[帖子](https://www.cfd-online.com/Forums/openfoam-bugs/194353-mapfields-major-bug.html)改了还是不行)，但用同样的mapFieldsDict试一试OpenFOAM/4.0-foss-2016b或者OpenFOAM-5.x不仅速度快而且不会有莫名其妙的报错
 
+
 ```bash
 #!/bin/bash
 source=/some/case/to/be/mapped
@@ -152,6 +153,9 @@ cuttingPatches
 // ************************************************************************* //
 
 ```
+
+### rotate data then mapFields
+想要rotate data，transformPoints声称可以rotate polyMesh里面的points(也就是网格)，也可以rotate vector field.试过了，确实可以，paraview上就看出来转了90度，但是!将rotate过后的再mapFields就不成功了，经过反复测试始终还是rotate之前的data被map过去了的感觉
 
 ## reconstructPar
 
