@@ -14,6 +14,45 @@ tags:
 
 # 如何被OpenFOAM骗
 
+## setFields
+setFields用于在internalField里面写一个值。选择区域最常用的估计是`boxToCell`，但定义`box`有格式
+```cpp
+box (x1 y1 z1) (x2 y2 z2);
+
+// 这里必须有 x1 < x2, y1 < y2, z1 < z2
+```
+如果不符合上述规范，不会有报错，但不会在internalField里面有写任何的值
+
+这里给出一个符合规范的setFieldsDict
+```cpp
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defaultFieldValues
+(
+    volScalarFieldValue T 0
+);
+
+regions
+(
+    boxToCell
+    {
+        box (-0.004 -0.08 -0.004) (0.004 -0.004 0.004);
+        fieldValues
+        (
+            volScalarFieldValue T 1
+        );
+    }
+);
+```
+
 ## probes
 OpenFOAM本身的probes如果刚好碰上网格边上会有warning   
 属于functionObjects，在simu的同时运行，如果想要postProcssing，用execFlow...，但是：需要在constrolDict里面加入,自己写的BC会有奇怪报错...   
