@@ -62,9 +62,11 @@ $ find . -maxdepth 1 -type d -print | wc -l
 # find directories in . and grep the str (**fast**)
 $ find . -type d | grep "2" 
 # (**slower**) but only will not produce results of sub directory of '2' as the previous one did.
-$ find . -type d -name '2' -print 
+$ find . -type d -name '2' -print  # dry run 
+$ find . -type d -name '2' -delete # this wont work !! instead : xxx | xargs rm -r 是有效的
 
-# find file matching pattern then delete them.
+# find file matching pattern (dry run) then delete them.
+$ find . -type f -name 'plotoverline.*.csv' -print 
 $ find . -type f -name 'plotoverline.*.csv' -delete 
 # find in somedir all subdirectories and chmod to defaut 775
 $ find somedir -type d -exec chmod 775 {} \;  
