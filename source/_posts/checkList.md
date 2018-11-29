@@ -68,6 +68,21 @@ c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的
 3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
 4.  检查`log.submit`，查看jobs的情况
 
+## occigen 同步数据
+千万千万要注意`para0`，在dir里面并没有用到，一定要double check !!!!
+```bash
+#!/bin/bash
+
+para0=inlet_0p3
+para1=a_0p08
+para2=setT_St_1
+log=sync_log.$para1
+dir=/store/lmfa/fct/hluo/occigen/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/inlet_0p3/$para1
+
+rsync -av occigen:/scratch/cnt0028/mfa0464/hluo/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/$para0/$para1/$para2/* DATA --exclude processor* &&
+echo "DATA sync BirdCarreau : $para0 $para1 $para2 ended with success" >> $dir/$log
+```
+
 ## mapFields
 
 此为大坑，尤其是OF-2.x的版本，存在一些bug(不是fatal，但会让mapFields运行得无比慢，比fatal还可恶。按照[帖子](https://www.cfd-online.com/Forums/openfoam-bugs/194353-mapfields-major-bug.html)改了还是不行)，但用同样的mapFieldsDict试一试OpenFOAM/4.0-foss-2016b或者OpenFOAM-5.x不仅速度快而且不会有莫名其妙的报错
