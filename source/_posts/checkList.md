@@ -22,38 +22,9 @@ tags:
 
 要知道，检查表可繁可简，为节约时间成本阿波罗13号出事之后检查表都被大规模简化，也就是“跳步”，而明白跳步的风险是简化的必须。所以检查表到底应该多繁多简，视情况而定。我根据自己的经验制作了一系列检查表，有的是配置算例流程，有的是关于某一个utility，还有NotToDo-list，总之对我怎么有用怎么来，还不止OpenFOAM，因为尤其跟CAE相关的软件都很大型，按钮特别多，记忆是不可靠的。加上如果在不同的计算机群上面计算，队列是不一样的，对用户的要求是不一样的（比如occigen上面对文件个数要求特别苛刻），用户的需求是不一样的（比如考虑到priority的问题，我又时候可能会选择提交一个计算时间较短的算例），情形很多，未必都需要检查表化，但按照自己的逻辑记录下要点，比起每次决策的时候再去网站上找零散的信息来得更高效。
 
-## Inkscape export
-
-- [ ] draw sketch
-- [x] Edit-> Resize page to selection
-- [ ] Export PNG image -> Export as 
-
-## paraview
-### do not skip time 0
-1. paraview data.foam
-2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (field data) is there. Make sense.
-3. uncheck "Skip Zero Time" -> apply : cell array will then appear
-
-### color map
-- 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
-- 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
-### 用load state来复现camera视角   
-target 目标视角：想要复制的视角，对应的case叫目标case   
-working 工作视角：想要在工作case下复现目标视角   
-0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
-1. 复制目标case下的`target.pvsm`到工作case(Visu)里，编辑查找关键字`target.foam`并替换成`工作路径/working.foam`
-2. 工作路径下创建`working.foam`
-3. 工作路径下打开paraview
-4. load state 选择编辑后的`target.pvsm`-> "Load State Data File Options" 选`Use File Names From State`
-5. 等待复现
-
-注意：
-1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
-2. 在paraview-5.4.1测试成功
-
 ## Pointwise 
 
-### export 
+### 网格导出流程
 
 - [ ] Select Solver : OpenFOAM 3D
 - [x] Set BC types : make sure "all boundaries" are set or you may encounter -> `--> FOAM FATAL ERROR: Continuity error cannot be removed by adjusting the outflow. Please check the velocity boundary conditions and/or run potentialFoam to initialise the outflow.`
@@ -63,7 +34,7 @@ working 工作视角：想要在工作case下复现目标视角
 - [ ] checkMesh
 - [ ] serial run to check
 
-###  导出为openfoam格式网格并配置周期条件cyclic
+### 配置openfoam周期条件
 
 **语境**   
 Pointwise里面网格为domain，OpenFOAM里面网格为patch   
@@ -75,6 +46,7 @@ Pointwise里面网格为domain，OpenFOAM里面网格为patch
 2. 按照pointwise基本流程导出网格文件，但在设置BC的时候设置成`patch`而不是`cyclic`
 
 3. 设置`createPatchDict`来完成`patch`到`cyclic`的转换. 默认createPatch 将生成新的网格文件，`-overwrite`可以改写原先网格文件，副产物还有一系列`*.obj`文件. 正确的dict配置如下：
+
 
 ```cpp
 //  File system/createPatchDict
@@ -123,49 +95,32 @@ Pointwise里面网格为domain，OpenFOAM里面网格为patch
 ## OpenFOAM simulation 完整流程
 
 0.  env                : purge modules ; set Foam environment
-1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]；格式上mesh可以变成binary(`foamFormatConvert -constant`)，但OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换
+1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]；格式上mesh变成binary后paraview读入会更快(`foamFormatConvert -constant`)，但OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换
 1.  compile BC         : 如果要用一个新的BC
 2.  initial condition (mapFields) and BC (changeDictionary)
 3.  topoSet
-4.  system/controlDict : if the startTime corresponds to initial time dir, 保证startTime和endTime不相同，如果相同的话openfoam还不会报错，log的末尾仍旧是`Finalising parallel run`
+4.  system/controlDict : check `startTime` 对不对, 保证startTime和endTime不相同，如果相同的话openfoam还不会报错，log的末尾仍旧是`Finalising parallel run` ; 如果有自己编译的模块，加入`libs ("*.so");`
 5.  serial run check
-6.  decomposePar -time 'time2Decomp' : clean in timeDir 'uniform' (not necessary for computation), need to verify if the time dir is well decomposed. 首先完成的是constant的划分，随后才是`time2Decomp`的划分
-7.  BC                 : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但`member`一定要都在)
-7.  job slurm file     : `--job-name` 8个字符 ; 队列, 节点数，每个节点task数，总task数（可以小于`节点数*单个节点task数`），预计计算长 ; 如果有 bash variable : np, nos ; (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再需要任何的环境配置
-a)  注意 `--exclusive` 是否必要
-b)  注意 `--mem` 是否足够
-c)  永远不要在executable后面加`&`幻想成后台运行，然后其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有
-8.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos
-9.  run on test if possible
-10. run simu/run jobs via python
-11. if fisrt run, touch userDefinedLog/removedTimes
-11. if any monitoring script, launch : 一定检查moniter函数的参数
-12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能BC上的value会被篡改
+6.  decomposePar -time 'startTime' : 清除`startTime目录`里面'uniform', 需要double check流场是否正确地被decompose. 首先写入硬盘的是constant/polyMesh的划分，后`field transfer`是流场的划分
+7.  BC                 : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但原则上`member`一定要都在，在BC编写时`write(Ostream&)`写对了就没有问题)
+8.  job slurm file     : 
+a)  `--job-name` 8个字符   
+b)  队列, 节点数，每个节点task数，总task数（可以小于`节点数*单个节点task数`），预估计算长   
+c)  可以含有 bash variable : np, nos   
+d)  (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再加入任何的环境配置，通过`0`里面实现slurm任务提交时正确的环境配置   
+e)  注意 `--exclusive` 是否必要   
+f)  注意 `--mem` 是否足够   
+g)  永远不要在executable后面加`&`幻想成后台运行，然后放在其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有   
+9.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos   
+10. run on test if possible   
+11. run job chain via python   
+a) if fisrt run, touch userDefinedLog/removedTimes   
+b) if any monitoring script or laundary script (`reconstruct` and `rm` regularly files in `processor*`), launch : 检查函数的参数   
+12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能`boundaryField`的value会被篡改
 
-## occigen 使用手册
 
-0.  openfoam env : 如果用python来做slurm多个连续任务提交，必须在提交前做好这一步；也就是说如果忘记了提交slurm会在第一个job报错，然后你发现slurm找不到`mpirun`，这时候补上再重新提交，新的提交第一个job能通过，但第二个job仍然会报错`找不到mpirun`；似乎slurm的默认环境是你登陆某login节点后第一次提交任务的环境，也就是说：login之后得首先做这个事情再提交任何算例(虽然直接使用`sbatch **`倒是不影响，但对通过python来提交的连续算例将会是致命的）
-1.  nohup python submit.py > log.submit : 提交job，通过`squeue`的返回值**离散地**监控job状态，通过返回值来检验一个算例完成后(这里还有个bug)修改`system/controlDict`里面`startTime`和`endTime`用于自动提交下一个算例(限制：simuLog不停地被改写，应该把每个job的log都留下来才好)；log.submit取好名字以方便查看
-2.  nohup python watchDog.py > log.watchDog : 设置一个运行最大时长，在这个时间内用`reconstructPar`来保留计算输出数据，删除`processor*`里面已经`reconstructPar`完成地时间步大幅度削减文件个数，保证不超过scratch的限额；log取好名字以方便查看
-3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
-4.  检查`log.submit`，查看jobs的情况
-
-## occigen 同步数据
-千万千万要注意`para0`，在dir里面并没有用到，一定要double check !!!!
-```bash
-#!/bin/bash
-
-para0=inlet_0p3
-para1=a_0p08
-para2=setT_St_1
-log=sync_log.$para1
-dir=/store/lmfa/fct/hluo/occigen/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/inlet_0p3/$para1
-
-rsync -av occigen:/scratch/cnt0028/mfa0464/hluo/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/$para0/$para1/$para2/* DATA --exclude processor* &&
-echo "DATA sync BirdCarreau : $para0 $para1 $para2 ended with success" >> $dir/$log
-```
-
-## mapFields
+## 预处理
+### mapFields
 
 此为大坑，尤其是OF-2.x的版本，存在一些bug(不是fatal，但会让mapFields运行得无比慢，比fatal还可恶。按照[帖子](https://www.cfd-online.com/Forums/openfoam-bugs/194353-mapfields-major-bug.html)改了还是不行)，但用同样的mapFieldsDict试一试OpenFOAM/4.0-foss-2016b或者OpenFOAM-5.x不仅速度快而且不会有莫名其妙的报错
 
@@ -251,15 +206,46 @@ cuttingPatches
 
 ```
 
-### rotate data then mapFields
+#### 旋转data然后mapFields
 想要rotate data，transformPoints声称可以rotate polyMesh里面的points(也就是网格)，也可以rotate vector field.试过了，确实可以，paraview上就看出来转了90度，但是!将rotate过后的再mapFields就不成功了，经过反复测试始终还是rotate之前的data被map过去了的感觉
 
-## reconstructPar
+## Inkscape 
+### 导出
+
+- [ ] draw sketch
+- [x] Edit-> Resize page to selection
+- [ ] Export PNG image -> Export as 
+
+## paraview
+### do not skip time 0
+1. paraview data.foam
+2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
+3. uncheck "Skip Zero Time" -> apply : cell array will then appear
+
+### color map
+- 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
+- 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
+### 用load state来复现camera视角   
+target 目标视角：想要复制的视角，对应的case叫目标case   
+working 工作视角：想要在工作case下复现目标视角   
+0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
+1. 复制目标case下的`target.pvsm`到工作case(Visu)里，编辑查找关键字`target.foam`并替换成`工作路径/working.foam`
+2. 工作路径下创建`working.foam`
+3. 工作路径下打开paraview
+4. load state 选择编辑后的`target.pvsm`-> "Load State Data File Options" 选`Use File Names From State`
+5. 等待复现
+
+注意：
+1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
+2. 在paraview-5.4.1测试成功
+
+## 后处理
+### reconstructPar
 
 在reconstructPar -fields '(U p)'之后，reconstructPar -fields '(phi)'会将phi添加到对应的时间目录里面.
 
 
-## sample
+### sample
 
 ```bash
 #!/bin/bash
@@ -277,7 +263,31 @@ c) sets或者surfaces的输出文件名都可以个性化编辑
 
 注：检查不出sample是否有结果？`rm -rf postProcessing ; sample` 这样会比较明确
 
-## 机群相关
+## cluster
+### occigen 
+#### 算例提交
+
+0.  openfoam env : **一句话**如果用python来做slurm多个连续任务提交，必须在提交前做好这一步(即checkList第`0`步).具体来说如果忘记了提交slurm会在第一个job报错，然后你发现slurm找不到`mpirun`，这时候补上环境变量再重新提交，新的提交第一个job能通过，但第二个job仍然会报错`找不到mpirun`；似乎slurm的默认环境是你登陆某login节点后第一次提交任务的环境，也就是说：login之后得首先做这个事情再提交任何算例(虽然直接使用`sbatch **`倒是不影响，但对通过python来提交的job chain会被迫终断）
+1.  nohup python submit.py > log.submit : 提交job，通过`squeue`的返回值**离散地**监控job状态，通过返回值来检验一个算例完成后(这里还有个bug)修改`system/controlDict`里面`startTime`和`endTime`用于自动提交下一个算例(限制：simuLog不停地被改写，应该把每个job的log都留下来才好)；log.submit取好名字以方便查看
+2.  nohup python watchDog.py > log.watchDog : 设置一个运行最大时长，在这个时间内用`reconstructPar`来保留计算输出数据，删除`processor*`里面已经`reconstructPar`完成地时间步大幅度削减文件个数，保证不超过scratch的限额；log取好名字以方便查看
+3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
+4.  检查`log.submit`，查看jobs的情况
+
+#### 数据同步
+
+千万千万要注意`para0`，在`dir`里面并没有用到，一定要double check !!!!
+```bash
+#!/bin/bash
+
+para0=inlet_0p3
+para1=a_0p08
+para2=setT_St_1
+log=sync_log.$para1
+dir=/store/lmfa/fct/hluo/occigen/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/inlet_0p3/$para1
+
+rsync -av occigen:/scratch/cnt0028/mfa0464/hluo/caseByGeometry/T/shape_square/2a_3_T/BirdCarreau/$para0/$para1/$para2/* DATA --exclude processor* &&
+echo "DATA sync BirdCarreau : $para0 $para1 $para2 ended with success" >> $dir/$log
+```
 ### newton
 1. No `#SBATCH --exclusive` (if not necessary)
 2. Naming of the file with exactly 8 chars with `-2` indicates for example 2nd run. Ex : `p10D_gP5-2`
