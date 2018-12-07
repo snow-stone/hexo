@@ -12,10 +12,11 @@ tags:
 2.不要对openfoam正在读写的文件进行操作
 第2点比较好规避，选择所有时间步，避开倒数2个，剩下的一般都写好了（一般输出数据间隔都不会很小）；而第1点，就需要保证第一步的返回值为0，经由判断后再进行相应删除
 
-另外[openfoam-plus_1712和openfoam5](https://www.openfoam.com/releases/openfoam-v1712/parallel.php)提供了一种直接输出一个整体流场`U, p, phi`的方式。但具体能否在较早版本中兼容使用待观察
+另外[openfoam-plus_1712和openfoam5](https://www.openfoam.com/releases/openfoam-v1712/parallel.php)提供了一种直接输出一个整体流场`U, p, phi`的方式。经尝试想要在早期版本中编译并行输出的模块很复杂，弃。
 
-# binary or ascii
-模拟的数据输出可以选择，各有优劣：binary数据存储体积更小，推荐在simu中间使用，而且在paraview读取数据的时候（20M算例，两个时间步）至少比ascii要快7倍；在初始场中推荐使用ascii，因为万一要改边界条件binary格式不是那么好下手(vimdiff或者meld都对ascii支持更好)，再者openfoam支持一个simu里面两种格式的储存，utility在读数据的时候包括solver在读数据的时候都是要读头文件以相应格式读取。
+# 格式
+**binary or ascii**   
+模拟的数据输出可以选择，各有优劣：binary数据存储体积更小，推荐在simu中间使用，而且在paraview读取数据的时候（20M算例，两个时间步）至少比ascii要快7倍；在初始场中推荐使用ascii，因为万一要改边界条件binary格式不是那么好下手(vimdiff或者meld都对ascii支持更好)，再者openfoam支持一个simu里面两种格式文件共存，utility在读数据的时候包括solver在读数据的时候都是要读头文件以相应格式读取。
 
 binary或者ascii，如何在二者中转换？  
 复杂解且不完全：比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii，`internalField`的读写应该没问题，但是BC呢还是得check一下
