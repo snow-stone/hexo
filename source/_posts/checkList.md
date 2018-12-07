@@ -210,36 +210,6 @@ cuttingPatches
 #### 旋转data然后mapFields
 想要rotate data，transformPoints声称可以rotate polyMesh里面的points(也就是网格)，也可以rotate vector field.试过了，确实可以，paraview上就看出来转了90度，但是!将rotate过后的再mapFields就不成功了，经过反复测试始终还是rotate之前的data被map过去了的感觉
 
-## Inkscape 
-### 导出
-
-- [ ] draw sketch
-- [x] Edit-> Resize page to selection
-- [ ] Export PNG image -> Export as 
-
-## paraview
-### do not skip time 0
-1. paraview data.foam
-2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
-3. uncheck "Skip Zero Time" -> apply : cell array will then appear
-
-### color map
-- 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
-- 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
-### 用load state来复现camera视角   
-target 目标视角：想要复制的视角，对应的case叫目标case   
-working 工作视角：想要在工作case下复现目标视角   
-0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
-1. 复制目标case下的`target.pvsm`到工作case(Visu)里，编辑查找关键字`target.foam`并替换成`工作路径/working.foam`
-2. 工作路径下创建`working.foam`
-3. 工作路径下打开paraview
-4. load state 选择编辑后的`target.pvsm`-> "Load State Data File Options" 选`Use File Names From State`
-5. 等待复现
-
-注意：
-1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
-2. 在paraview-5.4.1测试成功
-
 ## 后处理
 ### reconstructPar
 
@@ -381,3 +351,34 @@ hluo@visu $ cat /proc/cpuinfo | grep model
 #...
 model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 ```
+
+## Inkscape 
+### 导出
+
+- [ ] draw sketch
+- [x] Edit-> Resize page to selection
+- [ ] Export PNG image -> Export as 
+
+## paraview
+### do not skip time 0
+1. paraview data.foam
+2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
+3. uncheck "Skip Zero Time" -> apply : cell array will then appear
+
+### color map
+- 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
+- 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
+### 用load state来复现camera视角   
+target 目标视角：想要复制的视角，对应的case叫目标case   
+working 工作视角：想要在工作case下复现目标视角   
+0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
+1. 复制目标case下的`target.pvsm`到工作case(Visu)里，编辑查找关键字`target.foam`并替换成`工作路径/working.foam`
+2. 工作路径下创建`working.foam`
+3. 工作路径下打开paraview
+4. load state 选择编辑后的`target.pvsm`-> "Load State Data File Options" 选`Use File Names From State`
+5. 等待复现
+
+注意：
+1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
+2. 在paraview-5.4.1测试成功
+
