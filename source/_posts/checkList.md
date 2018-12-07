@@ -29,7 +29,10 @@ tags:
 - [ ] Export PNG image -> Export as 
 
 ## paraview
-用load state来复现camera视角   
+### color map
+- 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
+- 如果是`[0,a]`，用黑白灰最好，但paraview好像默认没有
+### 用load state来复现camera视角   
 target 目标视角：想要复制的视角，对应的case叫目标case   
 working 工作视角：想要在工作case下复现目标视角   
 0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
