@@ -28,6 +28,21 @@ tags:
 - [x] Edit-> Resize page to selection
 - [ ] Export PNG image -> Export as 
 
+## paraview
+用load state来复现camera视角   
+target 目标视角：想要复制的视角，对应的case叫目标case   
+working 工作视角：想要在工作case下复现目标视角   
+0. 目标视角的存储通过目标case(Visu)里`save state`来实现(默认读取了一个绝对路径的但其实为空白的`target.foam`文件)，得到`target.pvsm`
+1. 复制目标case下的`target.pvsm`到工作case(Visu)里，编辑查找关键字`target.foam`并替换成`工作路径/working.foam`
+2. 工作路径下创建`working.foam`
+3. 工作路径下打开paraview
+4. load state 选择编辑后的`target.pvsm`-> "Load State Data File Options" 选`Use File Names From State`
+5. 等待复现
+
+注意：
+1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
+2. 在paraview-5.4.1测试成功
+
 ## Pointwise export
 
 - [ ] Select Solver : OpenFOAM 3D
