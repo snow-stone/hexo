@@ -29,6 +29,11 @@ tags:
 - [ ] Export PNG image -> Export as 
 
 ## paraview
+### do not skip time 0
+1. paraview data.foam
+2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (field data) is there. Make sense.
+3. uncheck "Skip Zero Time" -> apply : cell array will then appear
+
 ### color map
 - 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
 - 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
