@@ -115,8 +115,8 @@ g)  永远不要在executable后面加`&`幻想成后台运行，然后放在其
 9.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos   
 10. run on test if possible   
 11. run job chain via python   
-a) if fisrt run, touch userDefinedLog/removedTimes   
-b) if any monitoring script or laundary script (`reconstruct` and `rm` regularly files in `processor*`), launch : 检查函数的参数   
+a) if "python laundary" : see checkList "laundary" (`reconstruct` and `rm` regularly files in `processor*`), launch : 检查函数的参数   
+b) if fisrt run, touch userDefinedLog/removedTimes   
 12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能`boundaryField`的value会被篡改
 
 
