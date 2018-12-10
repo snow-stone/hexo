@@ -30,7 +30,7 @@ tags:
 - [ ] Select Solver : OpenFOAM 3D
 - [x] Set BC types : make sure "all boundaries" are set or you may encounter -> `--> FOAM FATAL ERROR: Continuity error cannot be removed by adjusting the outflow. Please check the velocity boundary conditions and/or run potentialFoam to initialise the outflow.`
 - [x] Select blocks
-- [ ] Export CAE to some `$CASE/constant/polyMesh'
+- [ ] Export CAE to some "$CASE/constant/polyMesh"
 - [x] Rescale to meter : transformPoints -scale ’(0.001 0.001 0.001)’
 - [ ] checkMesh
 - [ ] serial run to check
