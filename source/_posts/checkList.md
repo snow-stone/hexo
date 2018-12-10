@@ -467,6 +467,7 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 ### color map
 - 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
 - 如果是`[0,a]`，用黑白灰最好，但paraview好像默认可以从`Edit Color Map`选项卡中带桃心的小按钮`Choose Preset`里面有`X-ray`和`GrayScale`，选择后apply（默认就会变到RGB color Space）；如果想要恢复diverging，最下面有个恢复默认按钮；如果想要自定义，参见[RBG自定义](https://www.cfd-online.com/Forums/openfoam-paraview/105630-paraview-gray-scale-white-black.html)
+
 ### 用load state来复现camera视角   
 target 目标视角：想要复制的视角，对应的case叫目标case   
 working 工作视角：想要在工作case下复现目标视角   
@@ -481,3 +482,36 @@ working 工作视角：想要在工作case下复现目标视角
 1. 还涉及一个working case里面时间步是不是和state里面一致的事情，我的测试刚好target和working case有相对应的同一时刻的data
 2. 在paraview-5.4.1测试成功
 
+### 根据x坐标截取一个cell slice的label
+cell slice : 这里的网格是正交的六面体，所以严格意义上一个x坐标对应“一层网格”，通过在paraview里面`find Data`中选取`xcoord between xx and xx`就可以选定这一系列cell   
+label      : 一系列的cell的label合起来就是个labelList，而且是全局的，因此可以取出`U`中例如`U[labelList_slice0]`子集进行操作   
+
+下为流程：
+0. paraview 可视化 case
+1. calculator : xcoord (defaut : point data)
+2. Filters -> Point data to cell data 这里我们只想对xcoord操作 但**注意** 这一步会将U(如果有的话)也插值一遍，值会跟先前有略微差别
+3. Edit -> fidn Data -> (cells) (Pointdatatocelldata) (criteria : xcoord between [xmin, xmax] -> run selection
+4. close "find Data" (selection is still effective)
+5. split horozontal (very smalll icon on the right above render view) -> spread sheet -> show only selected elements -> attribute : cells **注意**一定要选`cells`要不然得到的spread sheet行数不是cell number -> check 行数是否等于画网格时定下的个数
+6. Toggle cell visibility (eliminate other colons : left with only labelIDs) -> export spread sheet *.csv -> optional depending on paraview version (filter colons by visibility)
+7. modify *.csv : add OpenFOAM header (shown below), add `(` and `)` for list
+8. use OpenFOAM to read modified file via class `IOList<label>`
+
+```cpp
+// example of OpenFOAM header for file named "slice16"
+$ head -10 slice16
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       labelList; // IMPORTANT
+    object      slice0;    // not important
+}
+
+16900
+(
+/*
+ ...
+*/
+)
+```
