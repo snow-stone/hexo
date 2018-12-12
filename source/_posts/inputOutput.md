@@ -25,9 +25,12 @@ binary或者ascii，如何在二者中转换？
 # UList
 `UListIO.C`里有底层的`operator<<`，判断了是否输出的是ascii后判断是不是`uniform`的UList，如果是uniform就用`{}`，如果不是就用`()`，这就是为什么OpenFOAM里面只要输出List就一定带有大括号或者小括号.:q
 
-# 通过IOobject读入写出场
+# 通过IOobject读入写场
+注意，OpenFOAM里面场是`*Field`而`Field`是一个`List`，所以其实是`List`读写
 
-## 读入
+据测试...读的时候文件可以用绝对路径来且可以较长，但写的时候得注意绝对路径不一定奏效（即使确定了路径存在），为啥要说这一点，因为“不奏效”指无warning且不报错（如果debug不开的话）但就是找不到输出文件，写的时候用`constant`作为输出路径比较保险
+
+## 读
 
 ```cpp
 
@@ -47,7 +50,106 @@ volVectorField velocityField
 
 ```
 
-## 计算和输出（标准）
+## 写
+此例用runTime而没用用mesh作为objectRegistry，但需要`system/controlDict`
+
+```cpp
+// IOobjectWriter.C
+// List<label>
+
+#include "Time.H"
+#include "argList.H"
+
+#include "IOList.H"    // 自带 "List.H" ??
+#include "OFstream.H"
+
+using namespace Foam;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+int main( int argc, char *argv[])
+{
+    argList args(argc, argv);
+
+	Time runTime
+	(
+	    Time::controlDictName,
+		args.rootPath(),
+		args.caseName()
+	);
+
+    IOList<scalar> IOScalarList 
+    (
+        IOobject
+        (
+            "IOSList",
+            "constant",
+            runTime,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        )
+    );
+
+	List<scalar> sList(8);
+    sList[0] = 7.0;
+    sList[1] = 9.0;
+    sList[2] = 1.0;
+    sList[3] = 2.1;
+    sList[4] = 4.0;
+    sList[5] = 7.0;
+    sList[6] = 4.0;
+    sList[7] = 0.0;
+	IOList<scalar> IOScalarList1
+	(
+		IOobject
+	   	(
+			"IOSList1",
+		    "constant",
+			runTime,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+		),
+		sList
+	);
+
+    Info<< "Writing " << IOScalarList.name() << " to " << IOScalarList.objectPath() << endl;
+
+    OFstream os(IOScalarList.objectPath());   // 如果要用writeHeader，需要OFstream
+    OFstream os1(IOScalarList1.objectPath());
+
+	//writeHeader only
+	IOScalarList.writeHeader(os);
+	IOScalarList1.writeHeader(os1);
+
+	//output as list                          // 没有header，就是"( )" 样式的输出
+	//os << IOScalarList;
+	//os1 << IOScalarList1;
+
+	//output and header                       // 含有header，可以通过OpenFOAM再次读入，如上例volVectorField读入的时候文件必须含有header
+	//IOScalarList.write();
+	//IOScalarList1.write();
+	
+    Info<< "\nEnd\n" << endl;
+}
+
+// ************************************************************************* //
+
+
+// Make/files
+IOobjectWriter.C
+
+EXE = $(FOAM_USER_APPBIN)/IOobjectWriter
+
+// Make/options
+EXE_INC = \
+    -I$(LIB_SRC)/OpenFOAM/lnInclude
+
+EXE_LIBS = \
+    -lOpenFOAM
+
+```
+
+## 计算和写（标准）
 
 ```cpp
 
@@ -66,7 +168,7 @@ volScalarField strainRate
 
 ```
 
-## 计算和输出（避开量纲）
+## 计算和写（避开量纲）
 
 ```cpp
 
