@@ -69,14 +69,8 @@ using namespace Foam;
 
 int main( int argc, char *argv[])
 {
-    argList args(argc, argv);
-
-	Time runTime
-	(
-	    Time::controlDictName,
-		args.rootPath(),
-		args.caseName()
-	);
+    #include "setRootCase.H"
+    #include "createTime.H"
 
     IOList<scalar> IOScalarList 
     (
