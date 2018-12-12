@@ -142,6 +142,140 @@ EXE_LIBS = \
     -lOpenFOAM
 
 ```
+这里没有用到`fvCFD.H`这个容量超级大的`*.H`文件，也没有用到`class fvMesh`，仅仅是`List`的读入，算是个minimum code.但如果要加入读`volScalarField`呢？下面是上面代码加入`volScalarField`的变种，但如果想要保持尽量少的头文件并不容易.下面这段代码编译错误.
+```bash
+$ wmake
+SOURCE=userProbeByLabel.C ;  OMPI_CXX="g++" mpicxx -Dlinux64 -DWM_DP -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor -O2 -march=native -fuse-ld=bfd  -DNoRepository -ftemplate-depth-100 -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/finiteVolume/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/meshTools/lnInclude -IlnInclude -I. -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OSspecific/POSIX/lnInclude   -fPIC -c $SOURCE -o Make/linux64GccDPOpt/userProbeByLabel.o
+userProbeByLabel.C: In function ‘int main(int, char**)’:
+userProbeByLabel.C:59:7: error: variable ‘Foam::volScalarField mean’ has initializer but incomplete type
+       scalarFieldName+"_mean",
+       ^
+userProbeByLabel.C:76:14: error: variable ‘Foam::volScalarField scalarField’ has initializer but incomplete type
+              scalarFieldName,
+              ^
+userProbeByLabel.C:84:18: error: variable ‘Foam::volScalarField sPrime’ has initializer but incomplete type
+   volScalarField sPrime = scalarField - mean;
+                  ^
+make: *** [Make/linux64GccDPOpt/userProbeByLabel.o] Error 1
+```
+说明`volScalarField`并没有正确地被初始化，查`userProbeByLabel.dep`发现没有对应的模板类`GeometricField`的身影，但加入`#include "GeometricField.H"`的最终结果也是莫名其妙一堆错.当然一个肯定可行的解法是头文件加上`fvCFD.H`，基于测试我发现`#include "fvc.H"`或者`#include "fvm.H"`均可通过编译，而且能够正常运行.代码如下，关键行`#include "fvc.H"`被注释.
+
+```cpp
+#include "Time.H"
+#include "argList.H"
+#include "fvMesh.H"
+#include "timeSelector.H"
+
+//#include "fvc.H"  关键行
+
+#include <fstream>
+
+using namespace Foam;
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+int main( int argc, char *argv[])
+{
+    timeSelector::addOptions();
+	argList::validArgs.append("scalarFieldName");
+    argList::validArgs.append("timeOfAverageField");
+    argList::validArgs.append("position");
+
+    #include "setRootCase.H"
+    #include "createTime.H"
+
+	word scalarFieldName(args.additionalArgs()[0]);
+	word timeOfAverageField(args.additionalArgs()[1]);
+	word position(args.additionalArgs()[2]);
+
+	instantList timeDirs = timeSelector::select0(runTime, args);
+
+    IOList<label> labelGroup
+    (
+        IOobject
+        (
+            "labelGroup",
+            position,
+            runTime,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    );
+
+	//output and header
+	//labelGroup.write();
+	Info<< labelGroup << endl;
+
+	mkDir("userDefinedLog");
+	std::ofstream fluctuationLog
+	(
+	   	fileName(string("userDefinedLog")/string("fluctuation_labelGroup_"+scalarFieldName)).c_str(),
+		ios_base::app
+	);
+
+    #include "createMesh.H"
+
+	volScalarField mean
+	(
+	    IOobject
+	    (
+		    scalarFieldName+"_mean",  // 难道是 IOobject naming ???
+		    timeOfAverageField,
+		    mesh,
+		    IOobject::MUST_READ
+	    ),
+		mesh
+	);
+
+	forAll(timeDirs, timeI)
+	{
+		runTime.setTime(timeDirs[timeI], timeI); 
+	    Info<< "Time = " << runTime.timeName() << endl;
+
+		volScalarField scalarField
+		(
+        	IOobject
+        	(
+            	scalarFieldName,
+           	    runTime.timeName(),
+           		mesh,
+            	IOobject::MUST_READ
+        	),
+			mesh
+		);
+
+		volScalarField sPrime = scalarField - mean;
+
+        fluctuationLog << runTime.timeName() << " ";
+        forAll(labelGroup, i)
+        {
+            //fluctuationLog << labelGroup[i] << " " ;
+            fluctuationLog << sPrime.internalField()[labelGroup[i]] << " " ;
+        }
+        fluctuationLog << std::endl;
+	}
+	
+    Info<< "\nEnd\n" << endl;
+}
+
+// ************************************************************************* //
+
+// Make/files
+userProbeByLabel.C
+
+EXE = $(FOAM_USER_APPBIN)/userProbeByLabel
+
+// Make/options
+EXE_INC = \
+    -I$(LIB_SRC)/OpenFOAM/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude
+
+EXE_LIBS = \
+    -lOpenFOAM \
+    -lfiniteVolume \
+    -lmeshTools
+```
 
 ## 计算和写（标准）
 
