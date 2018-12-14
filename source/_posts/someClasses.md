@@ -89,4 +89,4 @@ a*a = (1 2 3 2 4 6 3 6 9)
 ```
 
 # List
-`List` and `UList` are different. `List a(10)` then `a.append(something)` will append to the tail of the initialized `a` resulting a `a[11]=something`  
+`List` and `UList` are different. `List a(10)` then `a.append(something)` will append to the tail of the initialized `a` resulting a `a[11]=something`  hha
