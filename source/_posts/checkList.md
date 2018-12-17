@@ -354,7 +354,7 @@ b) reconstructPar运行顺利，没有太多时间步积压在`processor*`里，
 0.  openfoam env : **一句话**如果用python来做slurm多个连续任务提交，必须在提交前做好这一步(即checkList第`0`步).具体来说如果忘记了提交slurm会在第一个job报错，然后你发现slurm找不到`mpirun`，这时候补上环境变量再重新提交，新的提交第一个job能通过，但第二个job仍然会报错`找不到mpirun`；似乎slurm的默认环境是你登陆某login节点后第一次提交任务的环境，也就是说：login之后得首先做这个事情再提交任何算例(虽然直接使用`sbatch **`倒是不影响，但对通过python来提交的job chain会被迫终断）
 1.  nohup python submit.py > log.submit : 提交job，通过`squeue`的返回值**离散地**监控job状态，通过返回值来检验一个算例完成后(这里还有个bug)修改`system/controlDict`里面`startTime`和`endTime`用于自动提交下一个算例(限制：simuLog不停地被改写，应该把每个job的log都留下来才好)；log.submit取好名字以方便查看
 2.  nohup python watchDog.py > log.watchDog : 设置一个运行最大时长，在这个时间内用`reconstructPar`来保留计算输出数据，删除`processor*`里面已经`reconstructPar`完成地时间步大幅度削减文件个数，保证不超过scratch的限额；log取好名字以方便查看
-3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
+G3.  笔记本上面记录下来是哪个login，什么算例，连续提交多少个job，每个job预计计算的物理的间隔是多少(用于更新`startTime`和`endTime`)：因为`ps -eaf | grep $USER`只能找出相应登陆节点上面的job
 4.  检查`log.submit`，查看jobs的情况
 
 #### 数据同步
@@ -526,4 +526,53 @@ FoamFile
  ...
 */
 )
+```
+
+## svn
+
+```bash
+# create branch by copying trunk
+$ svn copy https://subversion.renater.fr/jnnf/trunk https://subversion.renater.fr/jnnf/branches/haining -m 'create branch'
+
+# confirm existance of branch/haining in svn server
+$ svn list https://subversion.renater.fr/jnnf/branches/ 
+
+# get branch data from svn server
+[branches] $ svn update # better than : svn checkout https://subversion.renater.fr/jnnf/branches/haining. This will give problems when doing svn delete at the end of checkList
+
+# make changes on branch/haining, running tests
+
+# make sure branch itself is updated 
+$ svn update 
+
+# now we are going to push changes to trunk. BUT
+# firstly we have to merge from trunk to this branch (necessary step):
+# possibly we may get some conflicts for THIS merge.
+
+$ svn merge ^/trunk
+
+# verify modifications by running tests
+
+$ svn commit -m 'merge from trunk to branch/haining is sucessful. ready to reintegrate into trunk'
+
+# go to trunk
+
+[trunk] $ svn update
+
+# now re-integrate from branch/haining to trunk then managing possible conflicts (usually choose postpone and vim)
+$ svn merge --reintegrate ^/branches/haining
+
+# verify again changes by running tests
+# If all is well, we commit
+$ svn commit -m 'merged trunk from branches/haining'
+
+# branches/haining is now useless
+# thus remove them from version control meaning on the svn server. 
+$ svn rm branches/haining 
+$ svn commit 'removing branches/haining'
+$ svn list https://subversion.renater.fr/jnnf/branches/ # wont be able to see 'haining' anymore
+
+# checking status :
+[branches] $ svn status
+?       haining        # ? means no longer in version control
 ```
