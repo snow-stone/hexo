@@ -530,7 +530,7 @@ FoamFile
 
 ## svn
 
-video reference [here](https://www.youtube.com/watch?v=hubWjFgnjvI)
+video reference [createBranch](https://www.youtube.com/watch?v=Y9enCuIhwY8),[workWithBranches](https://www.youtube.com/watch?v=1LS-jHQbRXY),[resolvingConflicts](https://www.youtube.com/watch?v=hubWjFgnjvI)
 
 ```bash
 # create branch by copying trunk
