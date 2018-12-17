@@ -530,6 +530,8 @@ FoamFile
 
 ## svn
 
+video reference [here](https://www.youtube.com/watch?v=hubWjFgnjvI)
+
 ```bash
 # create branch by copying trunk
 $ svn copy https://subversion.renater.fr/jnnf/trunk https://subversion.renater.fr/jnnf/branches/haining -m 'create branch'
