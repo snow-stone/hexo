@@ -223,7 +223,7 @@ or userProbeByLabelVector_noMean its version for vectors. `$sliceStore` is where
 #### userFindClosestInLabelList
 前提是在input argument里面`sliceStore`处已经有`sliceNumberList`和`refVectors`，这个程序找的是遍历在`sliceNumberList`里面所有的slices找到离`refVectors`（**注**：这里仅有一个vector，但仍旧用vectors，为得是日后可以拓展）最近的cell，并将每个slice上面最近的cellID记下来写入到一个文件`labelGroup`.这个程序应当在一个OpenFOAM case中执行，其实就是提取网格信息，因此对于相同网格下的算例仅仅需要运行一次，于是就有了最后一个步骤将`labelGroup`移动到对应同一个网格的公共的目录下共享.详细checkList如下:
 
-0. `system/controlDict` change format to ascii
+0. 为了最终写出的labelList人类可读:`system/controlDikt` change format to ascii
 1. userFindClosestInLabelList xx xx
 2. cd constant
 3. mv file to a shared place (for all cases with the same mesh structure)
