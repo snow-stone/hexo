@@ -93,7 +93,8 @@ Pointwise里面网格为domain，OpenFOAM里面网格为patch
 注：createPatch在这里是由原先pointwise的twin domains/patches由类型`patch`变成了类型`cyclic`，据utility的功能介绍还可以将patches变成一个patch，或者将faceSet变一个patch
 
 
-## OpenFOAM simulation 完整流程
+## OpenFOAM
+### Simulation 完整流程
 
 0.  env                : purge modules ; set Foam environment
 1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]；格式上mesh变成binary后paraview读入会更快(`foamFormatConvert -constant`)，但OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换
@@ -120,8 +121,8 @@ b) checkList python auto submit
 12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能`boundaryField`的value会被篡改
 
 
-## 预处理
-### mapFields
+### preProcessing
+#### mapFields
 
 此为大坑，尤其是OF-2.x的版本，存在一些bug(不是fatal，但会让mapFields运行得无比慢，比fatal还可恶。按照[帖子](https://www.cfd-online.com/Forums/openfoam-bugs/194353-mapfields-major-bug.html)改了还是不行)，但用同样的mapFieldsDict试一试OpenFOAM/4.0-foss-2016b或者OpenFOAM-5.x不仅速度快而且不会有莫名其妙的报错
 
@@ -207,18 +208,18 @@ cuttingPatches
 
 ```
 
-#### 旋转data然后mapFields
+##### 旋转data然后mapFields
 想要rotate data，transformPoints声称可以rotate polyMesh里面的points(也就是网格)，也可以rotate vector field.试过了，确实可以，paraview上就看出来转了90度，但是!将rotate过后的再mapFields就不成功了，经过反复测试始终还是rotate之前的data被map过去了的感觉
 
-## 后处理
-### reconstructPar
+### postProcessing
+#### reconstructPar
 
 在reconstructPar -fields '(U p)'之后，reconstructPar -fields '(phi)'会将phi添加到对应的时间目录里面.
 
 
-### sample
+#### sample
 
-#### 基本流程
+##### 基本流程
 
 ```bash
 #!/bin/bash
@@ -236,7 +237,7 @@ c) sets或者surfaces的输出文件名都可以个性化编辑
 
 注：检查不出sample是否有结果？`rm -rf postProcessing ; sample` 这样会比较明确
 
-#### 用python写sampleDict
+##### 用python写sampleDict
 
 ```python
 # file writeSampleDict_2Diagonals.py
