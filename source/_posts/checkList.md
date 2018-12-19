@@ -530,11 +530,12 @@ FoamFile
 
 ## svn
 
-video reference [createBranch](https://www.youtube.com/watch?v=Y9enCuIhwY8),[workWithBranches](https://www.youtube.com/watch?v=1LS-jHQbRXY),[resolvingConflicts](https://www.youtube.com/watch?v=hubWjFgnjvI)
+video reference [createBranch](https://www.youtube.com/watch?v=Y9enCuIhwY8),[workWithBranches](https://www.youtube.com/watch?v=1LS-jHQbRXY),[resolvingConflicts](https://www.youtube.com/watch?v=hubWjFgnjvI),[svn_resolve_tree_conflict_in_merge](https://stackoverflow.com/questions/19451800/svn-resolve-tree-conflict-in-merge)
 
 ```bash
-# create branch by copying trunk
-$ svn copy https://subversion.renater.fr/jnnf/trunk https://subversion.renater.fr/jnnf/branches/haining -m 'create branch'
+# Note a good pratice : make sure trunk is updated to the lastest version
+# create branch by copying trunk. 
+$ svn copy https://subversion.renater.fr/jnnf/trunk https://subversion.renater.fr/jnnf/branches/haining -m 'create branch haining'
 
 # confirm existance of branch/haining in svn server
 $ svn list https://subversion.renater.fr/jnnf/branches/ 
@@ -543,36 +544,38 @@ $ svn list https://subversion.renater.fr/jnnf/branches/
 [branches] $ svn update # better than : svn checkout https://subversion.renater.fr/jnnf/branches/haining. This will give problems when doing svn delete at the end of checkList
 
 # make changes on branch/haining, running tests
+# if new file added : svn add
+[haining] $ svn commit -m 'information on modification'
 
 # make sure branch itself is updated 
-$ svn update 
+[haining] $ svn update 
 
 # now we are going to push changes to trunk. BUT
 # firstly we have to merge from trunk to this branch (necessary step):
 # possibly we may get some conflicts for THIS merge.
+[haining] $ svn merge ^/trunk
 
-$ svn merge ^/trunk
-
-# verify modifications by running tests
-
-$ svn commit -m 'merge from trunk to branch/haining is sucessful. ready to reintegrate into trunk'
+# verify merge by running tests
+# commit merge
+[haining] $ svn commit -m 'merge from trunk to branch/haining is sucessful. ready to reintegrate into trunk'
 
 # go to trunk
-
 [trunk] $ svn update
 
 # now re-integrate from branch/haining to trunk then managing possible conflicts (usually choose postpone and vim)
-$ svn merge --reintegrate ^/branches/haining
+[trunk] $ svn merge --reintegrate ^/branches/haining
 
 # verify again changes by running tests
 # If all is well, we commit
-$ svn commit -m 'merged trunk from branches/haining'
+[trunk] $ svn commit -m 'merged trunk from branches/haining'
 
 # branches/haining is now useless
 # thus remove them from version control meaning on the svn server. 
-$ svn rm branches/haining 
-$ svn commit 'removing branches/haining'
-$ svn list https://subversion.renater.fr/jnnf/branches/ # wont be able to see 'haining' anymore
+[branches] $ svn rm haining 
+[branches] $ svn commit 'removing branches/haining'
+
+# wont be able to see 'haining' anymore
+$ svn list https://subversion.renater.fr/jnnf/branches/ 
 
 # checking status :
 [branches] $ svn status
