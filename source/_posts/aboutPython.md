@@ -281,6 +281,66 @@ main() # 执行main函数
 
 小结：这里主要借我自己在OpenFOAM中后处理的用法（库，库的嵌套，字典，深度拷贝，函数返回值可以是多个[tuple或者dict]）来介绍**python的基本数据类型**，会在另一篇博客中给出针对`sample`这个重要的OpenFOAM utility的全部流程。
 
+## matplotlib
+通过传递`ax`来画出caseList里面的所有中间图像，利用`cut`来区分取实际数据的哪个slice，用`ax_principle`来画最终的图像
+
+```python
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 12 21:08:57 2018
+
+@author: hluo
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plotSlice(ax, sliceNumber, dataDir, cut=0.5):
+    data = np.genfromtxt("../"+dataDir+"/"+"userDefinedLog/slice"+str(sliceNumber)+"_mean_rms")
+    
+    time = data[:,0]
+    cutSliceIndex = int(cut*len(time))
+    
+    ax.plot(time[cutSliceIndex:],data[cutSliceIndex:,2])
+    ax.plot(time[:cutSliceIndex],data[:cutSliceIndex,2],linestyle=':')
+    ax.legend(bbox_to_anchor=(1.3, 1), ncol=1, shadow=True)
+    
+    return np.mean(data[cutSliceIndex:,2])
+    
+def plotCaseWithSlices(ax_cases, dataDir, positionList, marker, cut):
+    meanOfRMS = np.zeros(len(positionList))
+    
+    fig, ax_in_case = plt.subplots()
+    for i, position in enumerate(positionList):
+        meanOfRMS[i] = plotSlice(ax_in_case, position, dataDir, cut)
+
+    positionList = np.asarray(positionList)
+    ax_cases.plot(positionList/8.0,meanOfRMS, label=dataDir, marker=marker)
+    
+def main():
+    plt.style.use('seaborn-white')
+    caseList=["BirdCarreau/inlet_0p3",
+              "BirdCarreau/inlet_0p3-a_0p5-setT_St_1",
+              "BirdCarreau/inlet_0p3-a_0p5-setT_St_5"]
+    markerList=["s",
+                "^",
+                "o"]
+    positionList = [0,1,2,3,4,5,6,7,8,9,10,11,12,16,24,32,40,48,56,64,72,73,74,75]
+    
+    fig, ax_principle = plt.subplots()
+
+    for i, caseDir in enumerate(caseList):
+        plotCaseWithSlices(ax_principle, caseDir, positionList, markerList[i], cut=0.7)
+        
+    ax_principle.legend(bbox_to_anchor=(1., 1), ncol=1, shadow=True)
+    ax_principle.set_xlabel(r"$x/D$")
+    ax_principle.set_ylabel(r"mixing factor")
+    ax_principle.set_ylim(0,0.5)
+    fig.savefig('../PICTURE_mixingFactor/mixingFactor.png', bbox_inches='tight', dpi=300)
+    
+main()
+
+```
 
 # Debug
 ## 缩进
