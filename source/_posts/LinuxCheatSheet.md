@@ -7,6 +7,10 @@ tags:
 # bash
 
 ```bash
+# kill一系列进程，ps 可能搞出很多其他不相干的进程号，一定要注意，而且前三行一定不是，怎样通过awk滤过还不清楚
+$ ps | awk '{print $1}' | xargs kill
+
+
 # check for all jobs including "nohup" (at the same login noed)
 $ ps -eaf | grep $USER
 
