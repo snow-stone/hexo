@@ -552,6 +552,7 @@ FoamFile
 
 ## svn
 
+### branching
 video reference [createBranch](https://www.youtube.com/watch?v=Y9enCuIhwY8),[workWithBranches](https://www.youtube.com/watch?v=1LS-jHQbRXY),[resolvingConflicts](https://www.youtube.com/watch?v=hubWjFgnjvI),[svn_resolve_tree_conflict_in_merge](https://stackoverflow.com/questions/19451800/svn-resolve-tree-conflict-in-merge)
 
 ```bash
@@ -603,3 +604,7 @@ $ svn list https://subversion.renater.fr/jnnf/branches/
 [branches] $ svn status
 ?       haining        # ? means no longer in version control
 ```
+
+### resolving conflict
+
+`!M` : `svn rm file --force` (if it is `rm *` not by `svn remove`)
