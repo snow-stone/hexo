@@ -486,6 +486,11 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 - [ ] draw sketch
 - [x] Edit-> Resize page to selection
 - [ ] Export PNG image -> Export as 
+### clip
+1. import image
+2. F4 (select "rectangular tool") draw a rectangular (marked by red)
+3. F1 (select "select tool"), ctrl+A select all
+4. Object -> clip -> set
 
 ## paraview
 ### do not skip time 0
