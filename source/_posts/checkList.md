@@ -392,6 +392,12 @@ echo "DATA sync BirdCarreau : $para0 $para1 $para2 ended with success" >> $dir/$
 2. Naming of the file with exactly 8 chars with `-2` indicates for example 2nd run. Ex : `p10D_gP5-2`
 3. consider remove `#SBATCH --mem-per-cpu=4000` because there are nodes which bigger memory available
 
+#### error
+1. `error while loading shared libraries: libpsm_infinipath.so.1: cannot open shared object file: No such file or directory` : check `#SBATCH --mem`, this is an error saying you are maybe asking for more memory than the machine can offer
+2. `slurmstepd: error: Detected 1 oom-kill event(s) in step...` : check ``#SBATCH --mem`, this is an errory saying that the memory you are asking for is not enough for the program
+
+#### old note
+
 ```bash
 #!/bin/bash
 # FILE : p10D_gP5-2
