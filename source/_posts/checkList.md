@@ -498,7 +498,13 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 3. F1 (select "select tool"), ctrl+A select all
 4. Object -> clip -> set
 
+## gimp
+这个软件可以得到图片里面的坐标
+
 ## paraview
+### export screen shot
+export 有什么好说的？嗯......如果要对一系列算例做同样的图一般会选用`load state`来加载`*.pvsm`，似乎注意改一下`*.foam`对应的`path`就好，但是如果要让export screen shot输出同样像素的图的话，记得一定要全屏之后再export！！
+
 ### do not skip time 0
 1. paraview data.foam
 2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
