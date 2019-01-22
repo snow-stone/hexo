@@ -562,6 +562,14 @@ FoamFile
 )
 ```
 
+### scripting
+利用`Tools->Start Trace`选上`all properties` `Fully Trace Supplemental Proxies` `Show incremental Trace`   
+0. Open -> some `*.foam` file (no need for the real file when running script afterwards, but necessary here for GUI use, to generate the script to run) 
+1. clip... slice...
+2. export as
+3. Tools -> End trace
+4. `pvpython script.py`
+
 ## svn
 
 ### branching
