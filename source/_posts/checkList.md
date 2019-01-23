@@ -563,12 +563,41 @@ FoamFile
 ```
 
 ### scripting
+
+#### Base
 利用`Tools->Start Trace`选上`all properties` `Fully Trace Supplemental Proxies` `Show incremental Trace`   
 0. Open -> some `*.foam` file (no need for the real file when running script afterwards, but necessary here for GUI use, to generate the script to run) 
 1. clip... slice...
 2. export as
 3. Tools -> End trace
 4. `pvpython script.py`
+
+#### Note
+1. 值得注意的是legend，利用以上python trace的结果不加改动的情况下，会默认变得巨大，所以得加上
+2. 加上auto-rescale是个必须得有的好习惯
+3. 以上1和2的改动放在`renderView1`之前，经测试是有效的
+
+```python
+"""
+some operations : read some certain array
+"""
+# Properties modified on t_meanLUTColorBar    调整legend nu_mean** 需要根据实际object名字替换
+nu_meanLUTColorBar.TitleFontSize = 4
+nu_meanLUTColorBar.LabelFontSize = 4
+nu_meanLUTColorBar.ScalarBarThickness = 5
+nu_meanLUTColorBar.ScalarBarLength = 0.5
+
+# rescale color and/or opacity maps used to exactly fit the current data range  等同于auto-rescale
+slice1Display.RescaleTransferFunctionToDataRange(False, True)
+
+# current camera placement for renderView1    
+renderView1.CameraPosition = [0.013999999035149813, -0.08839503035519257, 0.0]
+renderView1.CameraFocalPoint = [0.013999999035149813, -0.0020000000949949026, 0.0]
+renderView1.CameraViewUp = [0.0, 0.0, 1.0]
+renderView1.CameraParallelScale = 0.022360679233547745
+
+# save screenshot
+```
 
 ## svn
 
