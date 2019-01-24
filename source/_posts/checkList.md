@@ -624,6 +624,13 @@ renderView1.ResetCamera()
 # save screenshot
 ```
 
+#### possible bug
+```python
+raise ValueError("%s is not a valid value for attribute %s." % (value, name))
+ValueError:  is not a valid value for attribute ScaleArrayComponent.
+```
+可能是最初没有读入后面要用到的数组，也有可能后面取slice什么的超出了计算域，感觉报的是个找不到`目标数据`的错
+
 ## svn
 
 ### branching
