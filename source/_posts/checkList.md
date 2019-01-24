@@ -598,6 +598,21 @@ renderView1.CameraParallelScale = 0.022360679233547745
 
 # save screenshot
 ```
+4. customize range, logscale, use another color mapping `它们之间`按照以下顺序排列是有效的
+```python
+# Rescale transfer function
+nu_meanPWF.RescaleTransferFunction(2e-06, 0.0003)
+
+# convert to log space
+nu_meanLUT.MapControlPointsToLogSpace()
+
+# Properties modified on nu_meanLUT
+nu_meanLUT.UseLogScale = 1
+
+# Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
+nu_meanLUT.ApplyPreset('Yellow - Gray - Blue', True)
+
+```
 
 ## svn
 
