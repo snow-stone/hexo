@@ -599,6 +599,7 @@ renderView1.CameraParallelScale = 0.022360679233547745
 # save screenshot
 ```
 4. customize range, logscale, use another color mapping `它们之间`按照以下顺序排列是有效的
+
 ```python
 # Rescale transfer function
 nu_meanPWF.RescaleTransferFunction(2e-06, 0.0003)
@@ -612,6 +613,15 @@ nu_meanLUT.UseLogScale = 1
 # Apply a preset using its name. Note this may not work as expected when presets have duplicate names.
 nu_meanLUT.ApplyPreset('Yellow - Gray - Blue', True)
 
+```
+
+5. 如果有多个不同位置的slice，那么一定要记得加上下面这一行(在save screenshot前就行)以保证图"有效部分"的大小不会改变
+
+```python
+# reset view to fit data
+renderView1.ResetCamera()
+
+# save screenshot
 ```
 
 ## svn
