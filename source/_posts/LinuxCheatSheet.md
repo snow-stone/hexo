@@ -109,4 +109,7 @@ s (insert) ->
 input "#" -> 
 Esc -> 
 all select block is then replaced by "#"
+
+# 1到10行，有caption关键词的行首加上#
+1,10s/.*caption/#\0/
 ```
