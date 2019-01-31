@@ -1,5 +1,5 @@
 ---
-title: 几个类
+title: OpenFOAM几个基本的类
 date: 2018-10-09 22:41:48
 tags:
 ---
