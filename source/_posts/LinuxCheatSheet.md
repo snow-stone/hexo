@@ -119,4 +119,11 @@ all select block is then replaced by "#"
 # paste without autoindent
 :set paste
 
+# add cursorline
+:set cursorline
+
+# reload file
+:e
+:edit
+
 ```
