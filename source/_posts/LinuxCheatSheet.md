@@ -111,5 +111,12 @@ Esc ->
 all select block is then replaced by "#"
 
 # 1到10行，有caption关键词的行首加上#
-1,10s/.*caption/#\0/
+:1,10s/.*caption/#\0/
+
+# encoding (other than utf8)
+:set fileencoding=iso-8859-1
+
+# paste without autoindent
+:set paste
+
 ```
