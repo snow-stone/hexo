@@ -693,6 +693,7 @@ $ svn list https://subversion.renater.fr/jnnf/branches/
 
 ### svn和git之间相互转换
 **一定要非常注意！**   
+0. 如果是我的thesis，先`make clean`
 1. `cp -r`拷贝整个文件夹到目的地文件夹   
 2. 如果是svn拷贝到git，一定要删掉`.svn` ; 如果反之，一定记得删掉 `.git` (.gitignore倒是无所谓啦)   
 3. 然后才**开始**进行其他操作
