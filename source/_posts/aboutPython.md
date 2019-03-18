@@ -349,6 +349,8 @@ import matplotlib
 matplotlib.use('agg')
 ```
 
+这样至少可以savefig成功
+
 # Debug
 ## 缩进
 文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
