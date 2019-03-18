@@ -690,6 +690,7 @@ $ svn list https://subversion.renater.fr/jnnf/branches/
 
 `!M` : `svn rm file --force` (if it is `rm *` not by `svn remove`)
 
+`out of date` : `svn update`; `svn resolved fileName` (one by one) ; `svn commit -m 'fix out of date'`
 
 ### svn和git之间相互转换
 **一定要非常注意！**   
