@@ -127,3 +127,18 @@ all select block is then replaced by "#"
 :edit
 
 ```
+
+# git
+
+```bash
+
+# 密码缓存300秒
+
+$ git config credential.helper 'cache --timeout=300'
+
+# 不再输入密码
+
+$ git config --global credential.helper store
+
+
+```
