@@ -342,6 +342,13 @@ main()
 
 ```
 
+在非图形化界面（非anacoda+spyder）情况下，有可能遇到`ImportError: No module named Tkinter`而卡住在backend上画不出任何图，需要在文件头加上
+
+```python
+import matplotlib                                                                                             
+matplotlib.use('agg')
+```
+
 # Debug
 ## 缩进
 文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
