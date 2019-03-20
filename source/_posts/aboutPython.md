@@ -351,6 +351,18 @@ matplotlib.use('agg')
 
 这样至少可以savefig成功
 
+```python
+# 这段代码修改的是全局变量，但是
+# 赋过初值之后就不能再修改
+# 也就是说如果有两个module，前一个font赋了值20，后一个怎么改都无效
+
+rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)    
+style.use('seaborn-white') # from defaut
+plt.rcParams.update({'font.size': 20})
+plt.rcParams['savefig.dpi'] = 100
+```
+
 # Debug
 ## 缩进
 文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
