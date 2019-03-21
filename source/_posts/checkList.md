@@ -140,6 +140,7 @@ a) $source里`empty`的BC（有试过，会有报错）
 b) 如果$source里面constant/polyMesh/boundary里面有`mappedPatch`，且如果$target里面没有相应的BC配置，可能会在mapFields最后写入数据的时候报错后果是例如U文件的写入遇到错误而被跳过].在$source有`mappedPatch`的情况下，$target里面constant/polyMesh/boundary也得改成相应BC  
 1. 如果不是consistent，目标case里面要编辑好文件mapFieldsDict
 2. 确认$source里面startTime，它会是mapFields完成后的时间目录，输出格式改为ascii
+3. 检查在`controlDict`里面`libs (...)`是否在当下环境中配置
 3. mapFields (等待时间可能很长)
 4. 手动检查mapFields是否无误地完成：检查目标case里面是否有'-nan'
 5. 把映射后的场的BC由`calculated`改成相应的物理BC，这样才可以续算，这个步骤可以通过changeDictionary来完成
