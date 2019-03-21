@@ -32,7 +32,7 @@ tags:
 - [x] Select blocks
 - [ ] Export CAE to some "$CASE/constant/polyMesh"
 - [x] Rescale to meter : transformPoints -scale ’(0.001 0.001 0.001)’
-- [ ] checkMesh
+- [ ] checkMesh [注：这里的skewness感觉是有量纲的(1/L^3)，从mm变到m之后，skewness从O(1e-9)变到O(1)]
 - [ ] serial run to check
 
 ### 配置openfoam周期条件
