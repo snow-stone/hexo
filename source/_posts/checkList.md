@@ -129,7 +129,7 @@ h)  注意 `--mem` 是否足够
 i)  主要任务执行行：即`srun`或`mpirun`那一行. 注意**切忌**行末加`&`幻想后台运行[例如后面一行还有其他executable的情况，如果当下行能后台，其后的command会被继续执行也许会有便利...但这样做的结果是`&`之后就没有然后了，而且还可能error message都没有，得不偿失]    
 j)  还在主要任务执行行 : 通常将标准输出改到 `> logFile` : 注意最好把所有的log都留下，也就是每一个任务换一个文件名 [*改到*：因为前面谈到`#SBATCH --output`，用这个选项会由slurm在机群上的任务提交顺序来命名，可读性不强，通常改写]   
 8.  [选项] submit job chain via python : 
-a)  [仅occigen] 因为`$SCRATCH`文件书目限制 : checkList python laundary   
+a)  [仅occigen] 因为`$SCRATCH`文件数目限制 : checkList python laundary   
 b)  checkList python auto submit   
 9.  paraview           : 有条件的话（因为通常processor文件数目很多）优先读decomposed case (因为internalField没有影响，但经测试reconstruct可能`boundaryField`的value会被篡改)
 
