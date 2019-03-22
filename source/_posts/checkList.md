@@ -96,29 +96,42 @@ Pointwise里面网格为domain，OpenFOAM里面网格为patch
 ## OpenFOAM
 ### Simulation 完整流程
 
-0.  env                : purge modules ; set Foam environment
-1.  mesh               : transformPoints -scale '(0.001 0.001 0.001)', checkMesh[need a time dir (empty dir is OK)]；格式上mesh变成binary后paraview读入会更快(`foamFormatConvert -constant`)，但OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换
-1.  compile BC         : 如果要用一个新的BC
-2.  initial condition (mapFields) and BC (changeDictionary)
-3.  topoSet
-4.  system/controlDict : check `startTime` 对不对, 保证startTime和endTime不相同，如果相同的话openfoam还不会报错，log的末尾仍旧是`Finalising parallel run` ; 如果有自己编译的模块，加入`libs ("*.so");`
+0.  env                : 
+a)  purge modules   
+b)  set Foam environment : `of301_intel`   
+1.  mesh               : 
+a)  `transformPoints -scale '(0.001 0.001 0.001)'`   
+b)  `checkMesh` [need a time dir (empty dir is OK)]   
+c)  推荐使用格式上mesh变成binary，无论计算时的读写还是paraview读入都会更快 : `foamFormatConvert -constant/-noZero` [OF-2.3.1和OF-3.0.1在binary上不兼容，得通过ascii转换]   
+2.  if needed, compile new BC
+3.  Set Initial Condition and Boundary Condition
+a)  IC (`mapFields/topoSet`)[OF-2.3.1 的 mapFields 就是个bug，推荐OF-4.x]   
+b)  BC (`changeDictionary`) [推荐此处IC,BC均用ascii，便于查错和纠正]   
+4.  system/controlDict : 
+a)  check `startTime` 对不对, 保证startTime和endTime不相同[如果相同openfoam不会报错，log的末尾仍旧是"Finalising parallel run"]   
+b)  如果有自己编译的模块，加入`libs ("*.so");`   
 5.  serial run check
-6.  decomposePar -time 'startTime' : 清除`startTime目录`里面'uniform', 需要double check流场是否正确地被decompose. 首先写入硬盘的是constant/polyMesh的划分，后`field transfer`是流场的划分
-7.  BC                 : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但原则上`member`一定要都在，在BC编写时`write(Ostream&)`写对了就没有问题)
-8.  job slurm file     : 
-a)  `--job-name` 8个字符   
-b)  队列, 节点数，每个节点task数，总task数（可以小于`节点数*单个节点task数`），预估计算长   
-c)  可以含有 bash variable : np, nos   
-d)  (仅occigen)为避免module相关输出(竟然module purge也会被认为是error我也是醉了)到`*_mpi.%j.err`，slurm file里就不再加入任何的环境配置，通过`0`里面实现slurm任务提交时正确的环境配置   
-e)  注意 `--exclusive` 是否必要   
-f)  注意 `--mem` 是否足够   
-g)  永远不要在executable后面加`&`幻想成后台运行，然后放在其后的command会被继续执行。这样做的结果是`&`之后就没有然后了，而且还可能error message都没有   
-9.  logFile            : Dont overwrite. Make sure system/controlDict* correspond to the nos   
-10. run on test if possible   
-11. run job chain via python   
-a) checkList python laundary
-b) checkList python auto submit
-12. paraview           : 优先decomposed case，internalField没有影响，但reconstruct之后可能`boundaryField`的value会被篡改
+6.  if 5 is correct, prepare for parallel run :
+a)  `decomposeParDict` 指定MPI并行进程数   
+b)  清除`startTime目录`里面'uniform'   
+c)  `decomposePar -time 'startTime'` : double check流场是否正确地被decompose. 首先写入硬盘的是constant/polyMesh的划分，后`field transfer`是流场的划分   
+d)  BC : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但原则上`member`一定要都在，在BC编写时`write(Ostream&)`写对了就没有问题)   
+e)  if any warning : 要警惕，问题应当就出在当前步   
+7.  如果测试节点足够，可考虑interactive parallel test；如不够，配置slurm file: 
+a)  `#SBATCH --job-name` : `sqeue` 只能显示前8个字符   
+b)  队列, 节点数`#SBATCH --nodes`，每个节点task数`#SBATCH --ntasks-per-node`，总task数需要在`srun`或者`mpirun`那一行用到（可以小于`节点数*单个节点task数`）   
+c)  预估计算长`#SBATCH --time`   
+d)  允许含有 bash variable   
+e)  默认定向输出：标准输出`#SBATCH --output`；error输出`#SBATCH --error`   
+f)  slurm执行任务时的计算环境初始化配置 : [仅occigen]为避免module相关输出到error(竟然`module purge`也会输出到error我也是醉了，而我python moniter目前只扫描error文件里面有没有输出，认为没有输出才是正常运行状态)，这里slurm file 就不再加入任何的环境配置，通过第一个步骤即步骤**0**里面实现slurm任务提交时正确的环境配置(登陆之后第一个load的module为默认slurm提交环境，如果想换个环境，得logout然后重新登陆)   
+f)  注意 `--exclusive` 是否必要   
+g)  注意 `--mem` 是否足够   
+h)  主要任务执行行：即`srun`或`mpirun`那一行. 注意**切忌**行末加`&`幻想后台运行[例如后面一行还有其他executable的情况，如果当下行能后台，其后的command会被继续执行也许会有便利...但这样做的结果是`&`之后就没有然后了，而且还可能error message都没有，得不偿失]    
+i)  还在主要任务执行行 : 通常将标准输出改到 `> logFile` : 注意最好把所有的log都留下，也就是每一个任务换一个文件名 [*改到*：因为前面谈到`#SBATCH --output`，用这个选项会由slurm在机群上的任务提交顺序来命名，可读性不强，通常改写]   
+8.  [选项] submit job chain via python : 
+a)  [仅occigen] 因为`$SCRATCH`文件书目限制 : checkList python laundary   
+b)  checkList python auto submit   
+9.  paraview           : 有条件的话（因为通常processor文件数目很多）优先读decomposed case (因为internalField没有影响，但经测试reconstruct可能`boundaryField`的value会被篡改)
 
 
 ### preProcessing
