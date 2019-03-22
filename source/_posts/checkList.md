@@ -115,7 +115,7 @@ b)  如果有自己编译的模块，加入`libs ("*.so");`
 a)  `decomposeParDict` 指定MPI并行进程数   
 b)  清除`startTime目录`里面'uniform'   
 c)  `decomposePar -time 'startTime'` : double check流场是否正确地被decompose. 首先写入硬盘的是constant/polyMesh的划分，后`field transfer`是流场的划分   
-d)  BC : double check 一下BC有没有被正确写入`processor*`(value可能被改写，但原则上`member`一定要都在，在BC编写时`write(Ostream&)`写对了就没有问题)   
+d)  BC : double check 一下BC有没有被正确写入`processor*`[value可能被改写，但原则上`member`一定要都在，在BC编写时`write(Ostream&)`写对了就没有问题]   
 e)  if any warning : 要警惕，问题应当就出在当前步   
 7.  如果测试节点足够，可考虑interactive parallel test；如不够，配置slurm file: 
 a)  `#SBATCH --job-name` : `sqeue` 只能显示前8个字符   
@@ -123,11 +123,11 @@ b)  队列, 节点数`#SBATCH --nodes`，每个节点task数`#SBATCH --ntasks-pe
 c)  预估计算长`#SBATCH --time`   
 d)  允许含有 bash variable   
 e)  默认定向输出：标准输出`#SBATCH --output`；error输出`#SBATCH --error`   
-f)  slurm执行任务时的计算环境初始化配置 : [仅occigen]为避免module相关输出到error(竟然`module purge`也会输出到error我也是醉了，而我python moniter目前只扫描error文件里面有没有输出，认为没有输出才是正常运行状态)，这里slurm file 就不再加入任何的环境配置，通过第一个步骤即步骤**0**里面实现slurm任务提交时正确的环境配置(登陆之后第一个load的module为默认slurm提交环境，如果想换个环境，得logout然后重新登陆)   
-f)  注意 `--exclusive` 是否必要   
-g)  注意 `--mem` 是否足够   
-h)  主要任务执行行：即`srun`或`mpirun`那一行. 注意**切忌**行末加`&`幻想后台运行[例如后面一行还有其他executable的情况，如果当下行能后台，其后的command会被继续执行也许会有便利...但这样做的结果是`&`之后就没有然后了，而且还可能error message都没有，得不偿失]    
-i)  还在主要任务执行行 : 通常将标准输出改到 `> logFile` : 注意最好把所有的log都留下，也就是每一个任务换一个文件名 [*改到*：因为前面谈到`#SBATCH --output`，用这个选项会由slurm在机群上的任务提交顺序来命名，可读性不强，通常改写]   
+f)  slurm执行任务时的计算环境初始化配置 : [仅occigen]为避免module相关输出到error(竟然`module purge`也会输出到error我也是醉了，而我python moniter目前只扫描error文件里面有没有输出，认为没有输出才是正常运行状态)，这里slurm file 就不再加入任何的环境配置，通过第一个步骤即步骤**0**里面实现slurm任务提交时正确的环境配置[登陆之后第一个load的module为默认slurm提交环境，如果想换个环境，得logout然后重新登陆]   
+g)  注意 `--exclusive` 是否必要   
+h)  注意 `--mem` 是否足够   
+i)  主要任务执行行：即`srun`或`mpirun`那一行. 注意**切忌**行末加`&`幻想后台运行[例如后面一行还有其他executable的情况，如果当下行能后台，其后的command会被继续执行也许会有便利...但这样做的结果是`&`之后就没有然后了，而且还可能error message都没有，得不偿失]    
+j)  还在主要任务执行行 : 通常将标准输出改到 `> logFile` : 注意最好把所有的log都留下，也就是每一个任务换一个文件名 [*改到*：因为前面谈到`#SBATCH --output`，用这个选项会由slurm在机群上的任务提交顺序来命名，可读性不强，通常改写]   
 8.  [选项] submit job chain via python : 
 a)  [仅occigen] 因为`$SCRATCH`文件书目限制 : checkList python laundary   
 b)  checkList python auto submit   
