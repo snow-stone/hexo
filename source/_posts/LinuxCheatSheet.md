@@ -126,6 +126,10 @@ all select block is then replaced by "#"
 :e
 :edit
 
+# 遇到难缠的(可能是硬的tab，也就是当下如果vim配置是以空格来做tab，也能通过/\t，搜索得到，且vim光标摁'j'移动不到行首，会卡住在这些tab的位置)
+# IndentationError: unindent does not match any outer indentation level
+:retab
+
 ```
 
 # git
