@@ -713,3 +713,8 @@ $ svn list https://subversion.renater.fr/jnnf/branches/
 2. 如果是根目录继续往下看   
 3. 如果是svn拷贝到git，一定要删掉`.svn` ; 如果反之，一定记得删掉 `.git` (.gitignore倒是无所谓啦)   
 4. 然后才**开始**进行其他操作
+
+## ubuntu in win10
+Terminal默认不能输入中文，vim打开也会乱码，需如此配置:   
+1. Terminal上端右键设置font，改为NSimSun : 这样在终端就可以敲出中文   
+2. vim 打开含中文字符的文本，`:set encoding?`如果不是`utf-8``se:set encoding=utf-8`: 这样vim里面的中文字符就会正确解码
