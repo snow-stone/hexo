@@ -516,6 +516,50 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 这个软件可以得到图片里面的坐标
 
 ## paraview
+
+### scripting
+似乎是默认读最后一个时间步，为免出错，每个case就一个时间步
+```python
+#### import the simple module from the paraview
+from paraview.simple import *
+#### disable automatic camera reset on 'Show'
+paraview.simple._DisableFirstRenderCameraReset()
+
+# create a new 'OpenFOAMReader'
+cavityfoam = OpenFOAMReader(FileName='/home/hluo/OpenFOAM/hluo-2.3.1/run/tutorials/incompressible/icoFoam/cavity_org/cavity.foam')
+
+print type(cavityfoam)
+print cavityfoam.CellArrays
+print type(cavityfoam.CellArrays)
+print "GetAvailable()"
+print cavityfoam.CellArrays.GetAvailable()
+print "GetData()"
+print cavityfoam.CellArrays.GetData()
+
+data=servermanager.Fetch(cavityfoam)
+print type(data)
+print "GetNumberOfBlocks() : " , data.GetNumberOfBlocks()
+#print "getBlock() : " , data.GetBlock(1)
+obj = data.GetBlock(0)
+print obj.GetNumberOfCells()
+
+cellData = obj.GetCellData()
+N = obj.GetNumberOfCells()
+#print cellData
+obj_p = cellData.GetArray('p')
+print type(obj_p)
+print "obj_p.GetDataTypeValueMin() : ", obj_p.GetDataTypeValueMin() # 这里得出的最大最小有问题
+print "obj_p.GetDataTypeValueMax() : ", obj_p.GetDataTypeValueMax()
+
+print obj_p.GetValue(10)
+
+print "GetRange() : ", obj_p.GetRange() # 这里貌似是正确的
+for i in range(N):
+    obj_p.SetValue(i, obj_p.GetValue(i)/10)
+
+print obj_p.GetValue(10)
+```
+
 ### export screen shot
 export 有什么好说的？嗯......如果要对一系列算例做同样的图一般会选用`load state`来加载`*.pvsm`，似乎注意改一下`*.foam`对应的`path`就好，但是如果要让export screen shot输出同样像素的图的话，记得一定要全屏之后再export！！
 
