@@ -522,7 +522,7 @@ export 有什么好说的？嗯......如果要对一系列算例做同样的图�
 ## blender
 一句话：通过paraivew做初期可视化，包括color map，导出后可通过blender调整camera和lamp. Paraview里面也有这个功能，但相对鸡肋.   
 
-blender version : 2.8 beta (compatibility issue : glibc too old in CentOS)[https://developer.blender.org/T58158]
+blender version : 2.8 beta [compatibility issue : glibc too old in CentOS](https://developer.blender.org/T58158)
 
 1. paraview -> visu -> File -> save Data -> `*.ply` (check coloring; check alpha : even if you dont have any transparency in paraview setting. This is important for blender/ or shall we say bug)   
 2. blencer -> File -> import -> `*.ply`   
