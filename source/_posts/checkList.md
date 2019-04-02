@@ -518,6 +518,24 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 ## paraview
 
 ### scripting
+
+#### 出图程序里面修改变量的range
+`LUT.RGBPoints`和`PWF.Points`里面上下界都得改，`PWF.RescaleTransferFunction`也要改：
+```python
+
+# get color transfer function/color map for 'k_mean_nonD'
+# ...
+k_mean_nonDLUT.RGBPoints = [1e-6, 0.231373, 0.298039, 0.752941, 0.00014459355054441403, 0.865003, 0.865003, 0.865003, 1, 0.705882, 0.0156863, 0.14902]
+
+# get opacity transfer function/opacity map for 'k_mean_nonD'
+# ...
+k_mean_nonDPWF.Points = [1e-06, 0.0, 0.5, 0.0, 1, 1.0, 0.5, 0.0]
+
+# Rescale transfer function
+k_mean_nonDPWF.RescaleTransferFunction(1e-06, 1)
+```
+
+#### 纯粹读数据，摸索数据结构
 似乎是默认读最后一个时间步，为免出错，每个case就一个时间步
 ```python
 #### import the simple module from the paraview
