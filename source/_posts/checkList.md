@@ -520,7 +520,7 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 ### scripting
 
 #### 出图程序里面修改变量的range
-`LUT.RGBPoints`和`PWF.Points`里面上下界都得改，`PWF.RescaleTransferFunction`也要改：
+`LUT.RGBPoints`和`PWF.Points`里面上下界都得改，`PWF.RescaleTransferFunction`也要改，当然`LUT.UseLogScale`也要改：
 ```python
 
 # get color transfer function/color map for 'k_mean_nonD'
@@ -533,6 +533,9 @@ k_mean_nonDPWF.Points = [1e-06, 0.0, 0.5, 0.0, 1, 1.0, 0.5, 0.0]
 
 # Rescale transfer function
 k_mean_nonDPWF.RescaleTransferFunction(1e-06, 1)
+
+# Properties modified on k_mean_nonDLUT
+k_mean_nonDLUT.UseLogScale = 0
 ```
 
 #### 纯粹读数据，摸索数据结构
