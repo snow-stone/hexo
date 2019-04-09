@@ -369,8 +369,9 @@ NLines2Dict(64)
 ### laundary
 为了防止occigen `$SCRATCH`关于文件数量的quota溢出，用python在后台`nohup`长时间地监控，对`userDefinedLog`里面`removedTimes`与`dataWritingHistory`的补集的时间步做`reconstructPar`和`rm -rf processor*/timeStep`   
 
+0. 拷贝`laundary.py`和`reconstruct_occigen-OF301.sh`   
 1. 保证`userDefinedLog/removedTimes`存在
-2. 设置python脚本的时间参数（预估simu时长，留出余量）和processor个数的参数
+2. 设置python脚本的时间参数（预估simu时长，留出laundary余量）和processor个数的参数
 3. 检查上一个laundary是否结束:`ls -l log.clean_*`看时间
 4. 判断`reconstructPar`的进程:`ls processor0 | xargs ls -l > log.ls`；如果有的目录没有顺利reconstructPar会有内容(非std output)输出到终端，至于目录对应上了但场是否完全(比如`U p nu phi`) reconstructPar 只能看`log.ls`
 a) reconstructPar有很多时间步积压，手动完成laundary，然后进行b)
