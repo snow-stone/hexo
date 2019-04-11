@@ -587,8 +587,8 @@ export 有什么好说的？嗯......如果要对一系列算例做同样的图�
 
 ### do not skip time 0
 1. paraview data.foam
-2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
-3. uncheck "Skip Zero Time" -> apply : cell array will then appear
+2. uncheck all "Cell Array" ; remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
+3. uncheck "Skip Zero Time" -> apply : cell array will then appear ; select field of interest.
 
 ### color map
 - 如果是对成的数据`[-a,a]`，用红白蓝`diverging`挺好，能分辨出`0`对应白
