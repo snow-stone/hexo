@@ -585,21 +585,6 @@ print obj_p.GetValue(10)
 ### export screen shot
 export 有什么好说的？嗯......如果要对一系列算例做同样的图一般会选用`load state`来加载`*.pvsm`，似乎注意改一下`*.foam`对应的`path`就好，但是如果要让export screen shot输出同样像素的图的话，记得一定要全屏之后再export！！
 
-## blender
-一句话：通过paraivew做初期可视化，包括color map，导出后可通过blender调整camera和lamp. Paraview里面也有这个功能，但相对鸡肋.   
-
-blender version : 2.8 beta [compatibility issue : glibc too old in CentOS](https://developer.blender.org/T58158)
-
-1. paraview -> visu -> File -> save Data -> `*.ply` (check coloring; check alpha : even if you dont have any transparency in paraview setting. This is important for blender/ or shall we say bug)   
-2. blencer -> File -> import -> `*.ply`   
-3. (optional but often needed) `s0.01`（导入的data通常会显得很大，需要缩小）: scale by 0.01;`s90x`以x为轴旋转90度；blender里面朝上通常为z   
-4. Now we have a render vie for data. Care now for coloring. -> choose `blender render` or `cycles render`   
-5. Add -> input -> attribut (the color attribute) : (i) name = Col ; (ii) connect "color" to "base color" of BSDF   
-6. 如果import的数据是contour，可能会有尖角出现，光滑一下：select mesh->object->shade smooth (need to be in object mode : normally by defaut)   
-7. 接下来就是调整camera和lamp了，最终blender出图是camera的视角，lamp可选太阳光什么的
-
-Note : Gratitude to Juan Ignacio Polanco
-
 ### do not skip time 0
 1. paraview data.foam
 2. remain defaut "Skip Zero Time" then apply : geometry will be visualized but no "Cell Array" (**field data**) is there. Make sense.
@@ -725,6 +710,22 @@ raise ValueError("%s is not a valid value for attribute %s." % (value, name))
 ValueError:  is not a valid value for attribute ScaleArrayComponent.
 ```
 可能是最初没有读入后面要用到的数组，也有可能后面取slice什么的超出了计算域，感觉报的是个找不到`目标数据`的错
+
+## blender
+一句话：通过paraivew做初期可视化，包括color map，导出后可通过blender调整camera和lamp. Paraview里面也有这个功能，但相对鸡肋.   
+
+blender version : 2.8 beta [compatibility issue : glibc too old in CentOS](https://developer.blender.org/T58158)
+
+1. paraview -> visu -> File -> save Data -> `*.ply` (check coloring; check alpha : even if you dont have any transparency in paraview setting. This is important for blender/ or shall we say bug)   
+2. blencer -> File -> import -> `*.ply`   
+3. (optional but often needed) `s0.01`（导入的data通常会显得很大，需要缩小）: scale by 0.01;`s90x`以x为轴旋转90度；blender里面朝上通常为z   
+4. Now we have a render vie for data. Care now for coloring. -> choose `blender render` or `cycles render`   
+5. Add -> input -> attribut (the color attribute) : (i) name = Col ; (ii) connect "color" to "base color" of BSDF   
+6. 如果import的数据是contour，可能会有尖角出现，光滑一下：select mesh->object->shade smooth (need to be in object mode : normally by defaut)   
+7. 接下来就是调整camera和lamp了，最终blender出图是camera的视角，lamp可选太阳光什么的
+
+Note : Gratitude to Juan Ignacio Polanco
+
 
 ## svn
 
