@@ -39,7 +39,7 @@ binary或者ascii，如何在二者中转换？
 复杂解且不完全：比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii，`internalField`的读写应该没问题，但是BC呢还是得check一下
 简单解且官方：foamFormatConvert，用system/controlDict里面的格式来写输出（不过这会overwrite原数据）,默认会将constant/polyMesh里面的数据也按照格式重写
 
-ascii格式的文件是OF-2.3.x/OF-3.0.1兼容的，但binary就不是，遇到以下报错需考虑版本问题
+`foamFormatConvert`也不是一直都行得通：ascii格式的文件是OF-2.3.x/OF-3.0.1兼容的，但binary就不是，遇到以下报错需考虑版本问题(另外一点窍门是转换的时候如果方便，把`constant`和`system`移动到与时间步分离的目录下运行`foamFormatConvert -constant`，这样可以避免时间步的数据被影响)
 ```bash
 --> FOAM FATAL IO ERROR: 
 Expected a ')' while reading binaryBlock, found on line 20 an error
