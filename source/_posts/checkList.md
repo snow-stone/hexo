@@ -227,6 +227,17 @@ cuttingPatches
 
 ### postProcessing
 
+#### 管理postProcessing
+`rsync.py`将远程的`postProcessing`同步到本地目录，并通过`json`将相关数据存入一个文本文件`database.txt`:   
+1. `sourceDir`:远程目录   
+2. `targetDir`:本地目录   
+3. `name2plot`:画图的时候用到的legend   
+还有`alias`，即一个对case简单描述的string
+
+画图的时候，在配置文件`parameters_*.py`里面有：读`database.txt`，通过alias来索引`database[alias]['targetDir']`和`database[alias]['name2plot']`
+
+一旦按照以上操作“1.获取数据”并“2.抓取数据画图”，只需要确认有一致的`alias`就可以确认“画的数据是自己想要的”，具体的数据信息也可以通过`database.txt`来最终索引，只要这个索引不出错，就不会错
+
 #### userProbeByLabel_noMean
 or userProbeByLabelVector_noMean its version for vectors. `$sliceStore` is where you put your `slice`+`number` file (class labelList). userProbeByLabel_noMean dont work on slices but on `labelGroup` which is itself a `labelList` containing all cell id of probes of interest (its defaut location is `$sliceStore`.
 
