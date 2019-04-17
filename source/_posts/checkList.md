@@ -238,6 +238,19 @@ cuttingPatches
 
 一旦按照以上操作“1.获取数据”并“2.抓取数据画图”，只需要确认有一致的`alias`就可以确认“画的数据是自己想要的”，具体的数据信息也可以通过`database.txt`来最终索引，只要这个索引不出错，就不会错
 
+#### uv : reynoldsStress
+```bash
+# toolchain for uv_mean @12
+userAverageVector U -time '6:12' # U_mean
+userReyTensor_plusAvg U 12 -noIntermediateWrite -time '6:12' # reyTensor_mean, 不输出中间的reyTensor速度还是比较快的
+userRMSuvw_fromReyTensor_mean -time '12' # uv_mean
+sample -dict $sampleDicts/sets/set4uv -time '12' > log.set4uv 2>&1  # 需要sampleDict : set4uv
+
+# 需要注意的在这里
+# 以上最后一步输出有128个sample的结果，但只用其中64个来算uv，因为上下壁面会相互抵消
+# 这就是[parameters_](https://github.com/snow-stone/python/blob/master/userSetUV/parameters_t_r-2a_1_gradP0p703125.py)里面`'raw_sample_size':64`的原因
+```
+
 #### userProbeByLabel_noMean
 or userProbeByLabelVector_noMean its version for vectors. `$sliceStore` is where you put your `slice`+`number` file (class labelList). userProbeByLabel_noMean dont work on slices but on `labelGroup` which is itself a `labelList` containing all cell id of probes of interest (its defaut location is `$sliceStore`.
 
