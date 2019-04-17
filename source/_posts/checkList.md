@@ -247,7 +247,7 @@ userRMSuvw_fromReyTensor_mean -time '12' # uv_mean
 sample -dict $sampleDicts/sets/set4uv -time '12' > log.set4uv 2>&1  # 需要sampleDict : set4uv
 
 # 需要注意的在这里
-# 以上最后一步输出有128个sample的结果，但只用其中64个来算uv，因为上下壁面会相互抵消
+# 以上最后一步输出有128个sample的结果，但只用其中64个来算uv，因为上下壁面会相互抵消(uv的定义相对于壁面，v的定义在两个壁面是反的)
 # 这就是[parameters_](https://github.com/snow-stone/python/blob/master/userSetUV/parameters_t_r-2a_1_gradP0p703125.py)里面`'raw_sample_size':64`的原因
 ```
 
