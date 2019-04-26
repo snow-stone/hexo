@@ -542,6 +542,10 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 
 ## paraview
 
+### 显示几何外形
+如果想要显示一下外形，但又不想要网格视角:   
+Clean to grid -> Extract surface -> change opacity
+
 ### scripting
 
 #### 出图程序里面修改变量的range
