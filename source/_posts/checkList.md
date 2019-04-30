@@ -548,6 +548,47 @@ Clean to grid -> Extract surface -> change opacity
 
 ### scripting
 
+#### load state
+`load state`也可以被载入到script里面(no legend)
+
+I. 用paraview生成`*.psvm`   
+1. `paraview` -> start trace -> open *.foam -> ...   
+2. saveFig (very possible I will do this. otherwise its nonsense.)   
+3. save state   
+4. stop trace
+
+II. 拿出上一步得到的script，把关键行(例如)
+```python
+LoadState('/store/T_c/1j/D2-NN-1j_test_from0p3_forcingSinus_St3p2_A_eq_0p05/hluo15_T_c_vorticity_z_300.pvsm', LoadStateDataFileOptions='Use File Names From State',
+    DataDirectory='/store/T_c/1j/D2-NN-1j_test_from0p3_forcingSinus_St3p2_A_eq_0p05',
+    OnlyUseFilesInDataDirectory=0,
+    D2NN1k_syn_forcingfoamFileName='/store/T_c/1j/D2-NN-1j_test_from0p3_forcingSinus_St3p2_A_eq_0p05/D2-NN-1k_syn_forcing.foam')
+```
+转换为
+```python
+SaveScreenshot(dirName+'/'+'hluo15_T_c_vorticity_z_300.png', renderView1, ImageResolution=[2754, 1838],
+    FontScaling='Scale fonts proportionally',
+    OverrideColorPalette='',
+    StereoMode='No change',
+    TransparentBackground=0, 
+    # PNG options
+    CompressionLevel='5')
+```
+
+尾巴上再加入
+```python
+import os
+print "Finalizing "+ os.path.basename(__file__) +" " + "@ dir : " + dirName 
+import datetime
+print datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+print "==============================="
+```
+
+III. 对不同目录（不同case）批量操作:   
+1. 拷贝`*.psvm`到相应目录（如果pvpython找不到`*.psvm`也会出图，白板）   
+2. 修改`*.psvm`里面带有关键字`.foam`的行，对应当下目录   
+3. 来到`run.sh`，用绝对路径作为参数开始批量运行
+
 #### 出图程序里面修改变量的range
 `LUT.RGBPoints`和`PWF.Points`里面上下界都得改，`PWF.RescaleTransferFunction`也要改，当然`LUT.UseLogScale`也要改：
 ```python
