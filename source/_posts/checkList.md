@@ -526,11 +526,15 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 ```
 
 ## Inkscape 
+
 ### 导出
 
 - [ ] draw sketch
 - [x] Edit-> Resize page to selection
-- [ ] Export PNG image -> Export as 
+- [ ] Export PNG image -> Export as -> Export
+
+在最后一步如果遇到"the chosen area to be exported is invalid",可以在`Export PNG Image`标签页里面四个标签`Page`,`Drawing`,`Selection`,`Custom`（默认是最后一个），选成比如说`Drawing`再点`Export`.
+
 ### clip
 1. import image
 2. F4 (select "rectangular tool") draw a rectangular (marked by red)
