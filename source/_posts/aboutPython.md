@@ -562,4 +562,6 @@ Test passed.
 >>> a > b
 False
 ```
-总结一下，这个库可以用于检测函数的基本功能是否完好。但需要满足前提条件：必须是三个引号那种注释，注释得是`>>>`这种interactive(也就是ipython)里面的格式且不能随意换行；可以在函数里面单独加入一个comment block；但是在头上加入一个随意其他的comment好像就会导致功能失效
+[关于操作符号与函数的mapping映射关系](https://docs.python.org/2/library/operator.html#mapping-operators-to-functions)
+
+总结一下，这个库可以用于检测函数的基本功能是否完好。但需要满足前提条件：必须是三个引号那种注释，注释得是`>>>`这种interactive(也就是ipython)里面的格式且不能随意换行；可以在函数里面单独加入一个comment block；但是在头上加入一个随意其他的comment好像有可能导致功能失效
