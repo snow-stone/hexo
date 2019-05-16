@@ -389,3 +389,177 @@ $ cat -A script.py
 
 ## str are immutable
 python里面`str`可以slice，但不能被修改，`string.replace`也只是对其拷贝进行的`replace`操作.[参考stackoverflow](https://stackoverflow.com/questions/46850850/python-function-to-modify-string)
+
+# doctest库
+这个库挺酷，不过不知道用处大不大，一言以蔽之：这是一个自我检测跨行注释里面内容是否通过测试的库。   
+
+```python
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+
+"""
+>>> a = Interval(30, 40)
+>>> b = Interval(35, 50)
+
+>>> a
+Interval(30, 40)
+
+>>> a == b
+False
+>>> a in b
+True
+
+>>> a[0], a[1]
+(30, 40)
+
+>>> a < b
+False
+>>> a < Interval(100, 200)
+True
+
+>>> a("some", "args")
+('called with ', ('some', 'args'))
+
+>>> len(a)
+10
+"""
+
+
+class Interval(object):
+    __slots__ = ('start', 'end')
+
+    def __init__(self, start, end):
+        self.start = start
+        self.end   = end
+
+    def __lt__(self, other): # a completely leftOf b ?
+        """
+        >>> a = Interval(30, 32)
+        >>> b = Interval(35, 50)
+        >>> a < b
+        True
+        """
+        return self.end < other.start
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end
+
+    def __getitem__(self, i): # a[0], a[1]
+        if not 0 <= i <= 1: raise IndexError
+        if i == 0: return self.start
+        if i == 1: return self.end
+
+    def __repr__(self): # representation of the object:
+        return "Interval(%i, %i)" % (self.start, self.end)
+
+    def __str__(self): # string of the object:
+        return "%i\t%i" % (self.start, self.end)
+
+    def __call__(self, *args): # a(*args)
+        return "called with ", args
+
+    def __len__(self): # len(a)
+        return self.end - self.start
+
+    def __add__(self, other):
+        return Interval(min(self.start, other.start), max(self.end, other.end))
+
+    def __contains__(self, other): # a in b
+        return other.start < self.end and other.end >= self.start
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+```
+
+测试`python demo1.py`没有任何输出；如果加上`-v`
+
+```bash
+$ python demo1.py -v
+Trying:
+    a = Interval(30, 40)
+Expecting nothing
+ok
+Trying:
+    b = Interval(35, 50)
+Expecting nothing
+ok
+Trying:
+    a
+Expecting:
+    Interval(30, 40)
+ok
+Trying:
+    a == b
+Expecting:
+    False
+ok
+Trying:
+    a in b
+Expecting:
+    True
+ok
+Trying:
+    a[0], a[1]
+Expecting:
+    (30, 40)
+ok
+Trying:
+    a < b
+Expecting:
+    False
+ok
+Trying:
+    a < Interval(100, 200)
+Expecting:
+    True
+ok
+Trying:
+    a("some", "args")
+Expecting:
+    ('called with ', ('some', 'args'))
+ok
+Trying:
+    len(a)
+Expecting:
+    10
+ok
+Trying:
+    a = Interval(30, 32)
+Expecting nothing
+ok
+Trying:
+    b = Interval(35, 50)
+Expecting nothing
+ok
+Trying:
+    a < b
+Expecting:
+    True
+ok
+10 items had no tests:
+    __main__.Interval
+    __main__.Interval.__add__
+    __main__.Interval.__call__
+    __main__.Interval.__contains__
+    __main__.Interval.__eq__
+    __main__.Interval.__getitem__
+    __main__.Interval.__init__
+    __main__.Interval.__len__
+    __main__.Interval.__repr__
+    __main__.Interval.__str__
+2 items passed all tests:
+  10 tests in __main__
+   3 tests in __main__.Interval.__lt__  # 函数里面的专属
+13 tests in 12 items.
+13 passed and 0 failed.
+Test passed.
+```
+不过这里要注意的是貌似python自带一个Interval的库，所以...有些干扰：比如这里只有`__lt__`和`__eq__`，没有`__gt__`，但可以有操作：
+
+```python
+>>> a > b
+False
+```
+总结一下，这个库可以用于检测函数的基本功能是否完好。但需要满足前提条件：必须是三个引号那种注释，注释得是`>>>`这种interactive(也就是ipython)里面的格式且不能随意换行；可以在函数里面单独加入一个comment block；但是在头上加入一个随意其他的comment好像就会导致功能失效
