@@ -282,6 +282,8 @@ main() # 执行main函数
 小结：这里主要借我自己在OpenFOAM中后处理的用法（库，库的嵌套，字典，深度拷贝，函数返回值可以是多个[tuple或者dict]）来介绍**python的基本数据类型**，会在另一篇博客中给出针对`sample`这个重要的OpenFOAM utility的全部流程。
 
 ## matplotlib
+
+### basics
 通过传递`ax`来画出caseList里面的所有中间图像，利用`cut`来区分取实际数据的哪个slice，用`ax_principle`来画最终的图像
 
 ```python
@@ -341,7 +343,7 @@ def main():
 main()
 
 ```
-
+### backend
 在非图形化界面（非anacoda+spyder）情况下，有可能遇到`ImportError: No module named Tkinter`而卡住在backend上画不出任何图，需要在文件头加上
 
 ```python
@@ -350,6 +352,8 @@ matplotlib.use('agg')
 ```
 
 这样至少可以savefig成功
+
+### rcParams
 
 ```python
 # 这段代码修改的是全局变量，但是
@@ -363,34 +367,19 @@ plt.rcParams.update({'font.size': 20})
 plt.rcParams['savefig.dpi'] = 100
 ```
 
-# Debug
-## 缩进
-文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
-```bash
-$ python -t script.py
-# This will warn you if you have mixed tabs and spaces
+### 图片尺寸大小
+```python
+fig, ax = plt.subplots(figsize=(16,10))    # 16 inches * 10 inches
 
-$ cat -A script.py
-# On *nix systems, you can see where the tabs
+# things plotted ...
+
+fig.savefig("*.png", bbox_inches='tight')  # "tight"会自适应边角，裁掉后不再是(16,10)；
+
+#用bbox_inches的初衷是把跑到画图框之外的legend强制包括到fig内，缺陷除了把figsize改写了还有就是
+#可能会把坐标轴ylabel不完全save到fig中去，如果出现了这种情况，去掉tight就好
 ```
-## spyder
-有次遇到了`TypeError: 'str' object is not callable`，找了半天都没有头绪，结果重启spyder就好了。说明有些错，真不简单，试试重启大法。
 
-
-# python提交算例到机群
-而你又没有pySlurm的时候.....
-
-# 实用手册
-
-## iterable
-`iterable`顾名思义就是“能堪循环者”，python里面循环可以有简单写法`for item in some_list:`，这样可以省去指明循环指标变量`i`。不专业的（我）使用的时候有时候还是想要加上`i`，但似乎不是所有的`iterable`都可以加`i`，例如`f = open(fileName,'r')`这里返回值`f`是`type file`，它就不能用`i`来引用，想要对它循环输出行号，我没有成功.[待贴代码验证]
-
-当iterable在循环中被改变(比如`list.remove()`)，要**特别注意**！！可能会直接跳出循环，因为iterable被改变了
-
-## str are immutable
-python里面`str`可以slice，但不能被修改，`string.replace`也只是对其拷贝进行的`replace`操作.[参考stackoverflow](https://stackoverflow.com/questions/46850850/python-function-to-modify-string)
-
-# doctest库
+## doctest库
 这个库挺酷，不过不知道用处大不大，一言以蔽之：这是一个自我检测跨行注释里面内容是否通过测试的库。   
 
 ```python
@@ -565,3 +554,31 @@ False
 [关于操作符号与函数的mapping映射关系](https://docs.python.org/2/library/operator.html#mapping-operators-to-functions)
 
 总结一下，这个库可以用于检测函数的基本功能是否完好。但需要满足前提条件：必须是三个引号那种注释，注释得是`>>>`这种interactive(也就是ipython)里面的格式且不能随意换行；可以在函数里面单独加入一个comment block；但是在头上加入一个随意其他的换行comment好像有可能导致功能失效
+
+# Debug
+## 缩进
+文本编辑器 vim > gedit 主要小心空格和tab混用，很难找出为啥来
+```bash
+$ python -t script.py
+# This will warn you if you have mixed tabs and spaces
+
+$ cat -A script.py
+# On *nix systems, you can see where the tabs
+```
+## spyder
+有次遇到了`TypeError: 'str' object is not callable`，找了半天都没有头绪，结果重启spyder就好了。说明有些错，真不简单，试试重启大法。
+
+
+# python提交算例到机群
+而你又没有pySlurm的时候.....
+
+# 实用手册
+
+## iterable
+`iterable`顾名思义就是“能堪循环者”，python里面循环可以有简单写法`for item in some_list:`，这样可以省去指明循环指标变量`i`。不专业的（我）使用的时候有时候还是想要加上`i`，但似乎不是所有的`iterable`都可以加`i`，例如`f = open(fileName,'r')`这里返回值`f`是`type file`，它就不能用`i`来引用，想要对它循环输出行号，我没有成功.[待贴代码验证]
+
+当iterable在循环中被改变(比如`list.remove()`)，要**特别注意**！！可能会直接跳出循环，因为iterable被改变了
+
+## str are immutable
+python里面`str`可以slice，但不能被修改，`string.replace`也只是对其拷贝进行的`replace`操作.[参考stackoverflow](https://stackoverflow.com/questions/46850850/python-function-to-modify-string)
+
