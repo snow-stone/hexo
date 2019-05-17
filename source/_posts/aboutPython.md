@@ -286,6 +286,8 @@ main() # 执行main函数
 ### basics
 ![](hierarchy.png)
 
+关于matplotlib里面Figure, Axes, Axis, Tick的层级关系，[这个博客](https://dev.to/skotaro/artist-in-matplotlib---something-i-wanted-to-know-before-spending-tremendous-hours-on-googling-how-tos--31oo)很好
+
 通过传递`ax`来画出caseList里面的所有中间图像，利用`cut`来区分取实际数据的哪个slice，用`ax_principle`来画最终的图像
 
 ```python
