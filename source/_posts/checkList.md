@@ -546,6 +546,22 @@ model name	: Intel(R) Xeon(R) CPU E5-2640 v4 @ 2.40GHz
 
 ## paraview
 
+### add image to a plot
+
+```python
+fig, ax = plt.subplots()
+
+# ...
+
+im = plt.imread('someFigure.png')
+rect=[0.1, 0.8, 0.3, 0.3]
+ax_new = fig.add_axes(rect, anchor='NE', zorder=-1) # 原Figure上add_axes
+ax_new.imshow(im)
+ax_new.axis('off') # 新axe不显示axis
+
+# fig.savefig() # 原Figure已经加上了im
+```
+
 ### 显示几何外形
 如果想要显示一下外形，但又不想要网格视角:   
 Clean to grid -> Extract surface -> change opacity
