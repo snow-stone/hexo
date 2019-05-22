@@ -66,13 +66,13 @@ FOAM exiting
 #### 读
 
 ```cpp
-
+// 读一个名为velocityFieldName的向量场
 volVectorField velocityField
 (
     IOobject
     (
         velocityFieldName,
-        runTime.timeName(),
+        runTime.timeName(),   // 所在目录
         mesh,
         IOobject::MUST_READ
     ),
@@ -81,7 +81,58 @@ volVectorField velocityField
 
 // 后面引用velocityField即可，注意这里只读了runtime.timeName()里面的，文件名为velocityFieldName这个文件
 
+// （始）读一个名为"labelGroup"的labelList 
+IOList<label> labelGroup
+(
+    IOobject
+    (
+        "labelGroup",
+        position,             // 所在目录
+        runTime,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    )
+);
+
+// 附上"labelGroup"文件的样本格式
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       labelList;
+    location    "constant";
+    object      labelGroup;
+}
+
+21
+(
+26524615
+25273885
+24395085
+23786685
+23330385
+22975485
+22671285
+22417785
+22198085
+21995285
+21826285
+21657285
+21657285
+21031985
+20355985
+19865885
+19494085
+19189885
+18919485
+18699785
+18496984
+)
+
+// (结) 读一个名为"labelGroup"的labelList
 ```
+
+**Note** : `topoSet`好像可以做`labelList`的操作，它的功能还很多！包括`{label/zone/face/point/box/rotatedBox/cylinder/sphere/...}toCell`
 
 #### 写
 此例用runTime而没用用mesh作为objectRegistry，但需要`system/controlDict`
