@@ -66,7 +66,7 @@ FOAM exiting
 #### 读
 
 ```cpp
-// 读一个名为velocityFieldName的向量场
+// (始) 读一个名为velocityFieldName的向量场
 volVectorField velocityField
 (
     IOobject
@@ -79,7 +79,7 @@ volVectorField velocityField
     mesh
 );
 
-// 后面引用velocityField即可，注意这里只读了runtime.timeName()里面的，文件名为velocityFieldName这个文件
+// (结) 后面引用velocityField即可，注意这里只读了runtime.timeName()里面的，文件名为velocityFieldName这个文件
 
 // （始）读一个名为"labelGroup"的labelList 
 IOList<label> labelGroup
