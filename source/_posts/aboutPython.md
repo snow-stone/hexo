@@ -385,6 +385,22 @@ fig.savefig("*.png", bbox_inches='tight')  # "tight"会自适应边角，裁掉�
 #可能会把坐标轴ylabel不完全save到fig中去，如果出现了这种情况，去掉tight就好
 ```
 
+### add image to a plot
+
+```python
+fig, ax = plt.subplots()
+
+# ...
+
+im = plt.imread('someFigure.png')
+rect=[0.1, 0.8, 0.3, 0.3]
+ax_new = fig.add_axes(rect, anchor='NE', zorder=-1) # 原Figure上add_axes
+ax_new.imshow(im)
+ax_new.axis('off') # 新axe不显示axis
+
+# fig.savefig() # 原Figure已经加上了im
+```
+
 ## doctest库
 这个库挺酷，不过不知道用处大不大，一言以蔽之：这是一个自我检测跨行注释里面内容是否通过测试的库。   
 
