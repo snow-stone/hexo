@@ -146,3 +146,47 @@ $ git config --global credential.helper store
 
 
 ```
+
+# latex
+
+建议做个makefile方便操作（见下）
+```bash
+new=actualVersion
+old=olderVersion
+
+all:
+    pdflatex ${new}.tex
+    bibtex ${new}
+    pdflatex ${new}.tex
+    pdflatex ${new}.tex
+
+old:
+    pdflatex ${old}.tex
+    bibtex ${old}
+    pdflatex ${old}.tex
+    pdflatex ${old}.tex
+
+bibs:
+    bibtex ${new}
+    bibtex ${old}
+
+diff:
+    latexdiff ${old}.tex ${new}.tex > diff.tex
+    latexdiff ${old}.bbl ${new}.bbl > diff.bbl
+    pdflatex diff.tex
+    pdflatex diff.tex
+
+clean:
+    rm *.bbl *.aux *.blg *.log
+```
+
+完整编译`${new}.tex`：`make`
+完整编译`${old}.tex`：`make old`
+用`latexdiff`完成对整篇`new`与`old`版本的对校（可以包括reference也可以不包括）: `make diff`
+
+用到reference对校功能的时候要注意：   
+1. 比较的是`*.bbl`而不是`*.bib`   
+2. 对校reference的时候，用`make bibs ; make diff`
+3. 对校成功的话，`old`为红色，`new`为蓝色     
+4. 改`new.bib`的时候要注意尽量不要增加新的field：例如`old.bib`里面没有`pages`,`volume`，如果在`new.bib`中加入，有可能让`latexdiff old.bbl new.bbl > diff.bbl` prompt，可以通过`enter`来跳过这一系列warning但最终得到的`diff.pdf`在reference部分会**在增加field的当前项开始后面全篇**都会被蓝色override干扰校对。经测试：增减1~2个field似乎在允许范围内  
+5. 让`latexdiff old.bbl new.bbl > diff.bbl` prompt有可能是`Stop`和`NoStop`，这种warning可以忽略
