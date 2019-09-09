@@ -190,3 +190,18 @@ clean:
 3. 对校成功的话，`old`为红色，`new`为蓝色     
 4. 改`new.bib`的时候要注意尽量不要增加新的field：例如`old.bib`里面没有`pages`,`volume`，如果在`new.bib`中加入，有可能让`latexdiff old.bbl new.bbl > diff.bbl` prompt，可以通过`enter`来跳过这一系列warning但最终得到的`diff.pdf`在reference部分会**在增加field的当前项开始后面全篇**都会被蓝色override干扰校对。经测试：增减1~2个field似乎在允许范围内  
 5. 让`latexdiff old.bbl new.bbl > diff.bbl` prompt有可能是`Stop`和`NoStop`，这种warning可以忽略
+
+## beamer
+
+overlays : 
+```latex
+\only<1>{}
+
+\onlyenv{}
+
+\begin{overprint}
+    \onslide<1>
+\end{overprint}
+
+%...
+```
