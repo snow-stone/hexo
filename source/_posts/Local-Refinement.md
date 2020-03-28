@@ -1,10 +1,8 @@
 ---
-title: Local_Refinement
+title: 局部网格加密
 date: 2018-07-12 20:59:41
-tags:
+tags: OpenFOAM
 ---
-
-# 局部网格加密
 
 基于tutorial里面cavity完全正交的网格(拓展为3D)，通过`topoSet`选定一个`cellSet`，用refineMesh进行局部加密。icoFoam求解器识别并接受这样局部加密的存在但对局部加密后的网格使用`checkMesh`会“检查出”polyhedra，而且non-orthogonality Max也会变差。
 
