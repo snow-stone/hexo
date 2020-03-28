@@ -1,7 +1,7 @@
 ---
 title: Python相关
 date: 2018-07-15 14:55:23
-tags:
+tags: python
 ---
 
 # 环境
@@ -9,9 +9,10 @@ tags:
 ![](pythonEnv.png)
 
 ## 我的需求
-easybuild依赖于python，简单介绍一下用easybuild：它属于Modules工具，可以（自动搜寻依赖关系）安装各种版本的python，安装相应的python库，配置相应的`清晰干净`的python环境，尤其在多用户高性能计算机群上广泛使用。我需要管理手头多个版本的OpenFOAM和与它们依赖的库（其实主要用到的也就mpi和scotch）。用户体验：当你的工作环境很单一不用Modules没问题，不过一旦复杂度上去了，用Modules工具可以做到事半功倍，"模块化的环境"不仅让工作环境清爽整洁、条理清楚，还可以不费劲地将自己熟悉的整个工作环境在另一台机器上复现出来。我手头与python依赖的环境有：
+easybuild依赖于python，简单介绍一下用easybuild：它属于Modules上一级的工具，可以（自动搜寻依赖关系）安装各种版本的python，安装相应的python库，配置相应的`清晰干净`的python环境，尤其在多用户高性能计算机群上广泛使用。我需要管理手头多个版本的OpenFOAM和与它们依赖的库（其实主要用到的也就mpi和scotch）。用户体验：当你的工作环境很单一不用Modules没问题，不过一旦复杂度上去了，用Modules工具可以做到事半功倍，"模块化的环境"不仅让工作环境清爽整洁、条理清楚，还可以不费劲地将自己熟悉的整个工作环境在另一台机器上复现出来。我手头与python依赖的环境有：
+
 1. Linux CentOS 系统自带 /usr/bin/python
-2. easybuild (仅基于1来安装)
+2. easybuild (基于1的安装)
 3. /usr/bin/ipython
 4. /usr/bin/pip
 5. anaconda
@@ -23,7 +24,7 @@ alias Easybuild='EASYBUILD_PREFIX=$HOME/.local/easybuild; \
                  module load EasyBuild; \
                  EASYBUILD_MODULES_TOOL=EnvironmentModules'
 ```
-也就是说默认不加载easybuild的环境，为何？
+根据我的设置，默认不加载easybuild的环境。
 ```bash
 $ echo $PYTHONPATH
 
@@ -31,15 +32,18 @@ $ Easybuild
 $ echo $PYTHONPATH
 /home/hluo/.local/easybuild/software/EasyBuild/3.2.1/lib/python2.7/site-packages
 ```
-看到图里面右上角那个至少有三个箭头朝外的环境变量了吗？就是它。而anaconda有它自己一套的环境变量:
+看到上图里面右上角那个至少有三个箭头朝外的环境变量了吗？就是它。
+
+而anaconda有它自己一套的环境变量:
+
 ```bash
 $ Anaconda                  # 加载anaconda环境
 $ which python
-~/bin/anaconda2/bin/python
+~/bin/anaconda2/bin/python  # 此处有python
 $ which ipython
-~/bin/anaconda2/bin/ipython
+~/bin/anaconda2/bin/ipython # 此处有ipython
 $ which pip
-~/bin/anaconda2/bin/pip     # 是不是开始复杂起来了。。
+~/bin/anaconda2/bin/pip     # 此处有pip，是不是开始复杂起来了。。
 
 $ ipython
 In [1]: import sphinx
@@ -51,14 +55,17 @@ In [3]: import numpy as np
 In [4]: np.__path__
 Out[4]: ['/home/hluo/.local/lib/python2.7/site-packages/numpy'] 
 ```
-为啥两个库存放的地方不同？按理说这是pip安装的目录(见下文)，我肯定之前干了什么然后失忆了，促成了此“姻缘”。。总之我在尝试安装h5py的时候遇到了各种问题，最终因为盘根错节根本厘不清！想搞清楚？重装吧。其实每次重新安装都有“做得更好”的可能，前提是厘清楚，然后养成好的习惯在使用的时候用哪一个就哪一个，切忌同时使用pip和anaconda。`一个程序就做一件事情，然后把它做好`，身边的那些计算机牛人们说过的话哈，引申一下受用了。
+为啥两个库存放的地方不同？按理说这是pip安装的目录(见下文)，我肯定之前干了什么然后失忆了，促成了此“姻缘”。。。总之我在尝试安装h5py的时候遇到了各种问题，最终因为盘根错节根本厘不清！想搞清楚？重装吧。其实每次重新安装都有“做得更好”的可能，前提是厘清楚，然后养成好的习惯在使用的时候用哪一个就哪一个，切忌同时使用pip和anaconda。
+
+**一个程序就做一件事情，然后把它做好**，身边的计算机牛人们说过的话，受用了。
 
 ## pip
-实验室哥们推荐我就用pip，他给我的使用建议：   
+实验室哥们推荐我单用pip，他给我的使用建议：   
 **安装**scipy，`pip install --user scipy`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
 **更新**scipy，`pip install scipy --user -U`，所安装的包就在`$HOME/.local/lib/python2.7/site-packages`   
 **移除**所安装的包直接删除对应位置的文件即可，如果想用另一个版本直接将当前的包删除即可，这样干净整洁不容易出错，此例中`rm -rf $HOME/.local/lib/python2.7/site-packages/scipy*`      
 **查看包的版本**   
+
 ```bash
 $ pip install scipy==
 Collecting scipy==
@@ -69,30 +76,34 @@ You should consider upgrading via the 'pip install --upgrade pip' command.
 ```
 如果是python3的库，那么就改用`pip3`，库函数就会放在`$HOME/.local/lib/python3.4/site-packages`（这里是3.4）
 ### 安装特例
-`h5py`的安装需要用到`devel`包（for developper 或者叫 no-binary 包），因为基于`h5py`的特性需要基于已有的`mpi`和`hdf5`重新编译，比如安装的时候报错`Python.H not found`，那就说明python包里面该有`*.H`的地方没有源文件，也许安装的不是开发者安装包（仅仅是pre-compiled后的库函数），当然另一个情况是给的头文件寻找路径不对。那如果报错是找不到`mpi.h`或者`hdf5.h`，那么就是环境中找不到`mpi`或`hdf5`包里的头文件，也对应前面两种可能。
+需要指出的是一般python包按照以上傻瓜安装就行，并不需要操心这么多，这里仅为一个特例。
 
-这里说起来有点绕，这是因为`h5py`是python对hdf5库的一个wrapper，也就是基于用C或者C++的hdf5库的接口重新包装的结果，因而需要保证在当前环境中hdf5的库完成配置（`CPATH`指定头文件的路径，`LD_LIBRARY_PATH`指定`*.so`库的搜索路径），hdf5又依赖于mpi，那么mpi也应该完成配置。这样才能保证重编译的基本要求。需要指出的是一般python包按照以上傻瓜安装就行，不需要操心这么多。
+`h5py`的安装需要用到`devel`包（for developper 或者叫 no-binary 包），因为基于`h5py`的特性需要基于已有的`mpi`和`hdf5`重新编译，比如安装的时候报错`Python.H not found`，那就说明python包里面该有`*.H`的地方没有源文件，也许安装的不是开发者安装包（仅仅是pre-compiled后的库函数，类似于`apt-get install`安装时从源上拷贝到本地的`packages`）；当然另一种可能的情况是给的头文件寻找路径不对。
 
-在python里面no-binary安装对应
+小结一下，如果报错找不到`mpi.h`或者`hdf5.h`，那么就是环境中找不到`mpi`或`hdf5`包里的头文件，也对应前面两种可能：包里面不包含`*.H`或者搜索路径不对。这种时候，意味着`h5py`需要在本地**重新编译**。
+
+这里说起来有点绕，这是因为`h5py`是python对hdf5库的一个wrapper，也就是基于用C或者C++的hdf5库的接口重新包装的结果，因而需要保证在当前环境中hdf5库已经配置完整（包括`CPATH`指定头文件的路径，`LD_LIBRARY_PATH`指定`*.so`库的搜索路径），别忘了hdf5依赖于mpi，那么mpi也应该完成配置。这样才能保证**重新编译**的基本要求，在python里面no-binary安装对应：
+
 ```bash
-$ pip install --user h5py # 预编译好的
+$ pip install --user h5py # 预编译
 $ pip install --no-binary=h5py h5py --user # no-binary 版本
 ```
 
 ## anaconda
-anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5，按照[要求](https://bitbucket.org/lesituu/timevaryingmappedhdf5fixedvalue)编译：要注意Make/options里面通过HDF5_DIR而不是CPATH和LD_LIBRARY_PATH来找，且在环境中设置不够，需要写入到Make/options里面`HDF5_DIR=$HOME/.local/easybuild/software/HDF5/1.8.17-foss-2016a`，这里的HDF5用easybuild安装，跟使用的OpenFOAM/2.3.1-foss-2016a匹配），就`h5py`来说，pip网上的资料还是多些。
+anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管理包的历史、更新、安装、卸载。我在初期就用anaconda，试图用conda安装h5py失败了（安装h5py的动机[源自一篇关于OpenFOAM湍流进口条件的学士论文](https://github.com/timofeymukha/eddylicious)，可惜这个人写的库只适用于structured rectilinear grid，也就是进口得是方形，圆管就不行了。对于我来说，直接用用不上，但eddylicious库的编写里得更多的是面向过程，加上只有一个轴的方向`y`是边界层，蛮好读懂；另一方面他改写了timeVaryingMappedFixedValue，把输出格式改成了HDF5，按照[要求](https://bitbucket.org/lesituu/timevaryingmappedhdf5fixedvalue)编译：要注意Make/options里面通过`HDF5_DIR`而不是`CPATH`和`LD_LIBRARY_PATH`来找，且在环境中设置不够，需要写入到Make/options里面`HDF5_DIR=$HOME/.local/easybuild/software/HDF5/1.8.17-foss-2016a`，这里的HDF5用easybuild安装，跟使用的OpenFOAM/2.3.1-foss-2016a匹配），就`h5py`来说，pip网上的资料还是多些。
 
 # IDE
 我在windows和linux下也都有anaconda，主要用在包里的spyder，可以实时查看数组变量（函数内部的变量在IDE里面查看不了，因为没有暴露在当前执行脚本的环境中），这在python学习初期很有用，在初期学习中可以有意识地不写函数，这样所有的变量都在可追溯的`Variable explorer`里面便于实时查看。想要查看某变量的类型，在里面集成的ipython console通过`type(variable)`输出即可。   
 我选spyder的主要原因：   
-1. 用matplotlib画图的时候就在ipython console即时输出图片，避免另弹出画图的新窗口+手动关闭窗口，看到图片就可以调整legend的位置还有字体大小什么的，很直观；如果要拷贝图片另存为png格式直接右键`save image as`就可以，所见即所得（为何这样说？如果legend在图片box外面，`savefig`不会将legend包括进去，也就说savefig最终不会包含box外的legend）。
+
+1. 用matplotlib画图的时候就在ipython console即时输出图片，避免另弹出画图的新窗口+手动关闭窗口，看到图片就可以调整legend的位置还有字体大小什么的，很直观；如果要拷贝图片另存为png格式直接右键`save image as`就可以，**所见即所得（为何这样说？如果legend在图片box外面，`savefig`不会将legend包括进去，也就说savefig最终不会包含box外的legend）**。
 2. 库函数自动补全
 3. 注释和去注释方便，缩进和去缩进方便，高亮易辨识
 4. 鼠标点击函数，在不同的库之间跳转
 
-**福利**：spyder -> File -> Print to File (PDF) 有语法高亮
+**福利**: spyder -> File -> Print to File (PDF) 有语法高亮
 
-**局限**: 在3d plot里面有些图（比如3D云图）是可以鼠标拖着旋转的，但在spyder里面就是个静止的图（可能原因在于就其本源可能还不如货真价实的ipython console）；因此animation当然也在spyder里面看不了,这个时候就都得回到无IDE下的python解释器环境
+**局限**: 上面1提到的legend在外的情况可能会有点麻烦；在3d plot里面有些图（比如3D云图）是可以鼠标拖着旋转的，但在spyder里面就是个静止的图（可能原因在于就其本源可能还不如货真价实的ipython console）；因此animation当然也在spyder里面看不了，这个时候就都得回到无IDE下的python解释器环境
 
 # 基本数据类型
 **Sequence Types** — str, unicode, list, tuple, bytearray, buffer, xrange  
@@ -118,7 +129,12 @@ anaconda也可以安装在自己`$HOME`下且包很全，有个conda命令来管
 A mapping object maps hashable values to arbitrary objects. Mappings are mutable objects (in c++ there are also mutable objects, what are they?). There is currently **only one** standard mapping type, the dictionary.
 Dictionaries can be created by placing a comma-separated list of key: value pairs within braces, for example: {'jack': 4098, 'sjoerd': 4127} or {4098: 'jack', 4127: 'sjoerd'}, or by the dict constructor.
 
-以上是抄写，这里是个人使用心得：list里面可以放不同类型的变量，很有用；tuple可以作为函数return多个值的时候的选项例如`fig, ax = plt.subplots()`，当然dictionary也可以；我在OpenFOAM后处理脚本里面用到dict，因为一个dictionary就可以包含算例的绝对路径、后处理时间区间，后处理数据shape...更重要的是在程序读取并处理数据时，主程序里`暴露`出从key到value的过程，比如如果我画平均值就取名为`mean`，如果画均方根就取名为`rms`，这样后处理程序可读性会大大提高；numpy里面array当然用得很多，list可以转化为array
+以上是抄写，这里是个人使用心得：
+
+1. list里面可以放不同类型的变量，很有用；
+
+2. tuple可以作为函数return多个值的时候的选项例如`fig, ax = plt.subplots()`，当然dictionary也可以；
+3. 我在OpenFOAM后处理脚本里面用到dict，因为一个dictionary就可以包含算例的绝对路径、后处理时间区间，后处理数据shape...更重要的是在程序读取并处理数据时，主程序里`暴露`出从key到value的过程，比如如果我画平均值就取名为`mean`，如果画均方根就取名为`rms`，这样后处理程序可读性会大大提高；numpy里面array当然用得很多，list可以转化为array
 
 # 库的使用
 python强大的地方当然是有各种很棒的库的支持(numpy, scipy, matplotlib等)，使用库用关键字`import`就行。如何查询所用库的路径？进入ipython
