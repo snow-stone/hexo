@@ -1,10 +1,8 @@
 ---
-title: Q&A
+title: 我的自问自答0
 date: 2018-10-06 02:44:18
-tags:
+tags: 自问自答
 ---
-
-# 这里显然是自问自答区
 
 ## 如何做出成体系好debug的后处理tool chain？
 答：先用bash把我的user*系列utility连起来，通过文件夹好好组织；后续的python后处理一定要主程序条理清楚，加上合适的输出，去掉冗余输出，有exception control；一个类别的后处理，尽量用同一个python module去实现通用。往具体的说：先做好牛顿流动的case，在一个个case中成长，在痛苦中净化和进化。
