@@ -1,7 +1,7 @@
 ---
-title: OpenFOAM
+title: OpenFOAM积累学习0
 date: 2019-01-31 10:02:19
-tags:
+tags: OpenFOAM
 ---
 
 # IO
@@ -15,11 +15,11 @@ IO的基本特征是硬盘读写，耗时间。
 ## Serial or parallel ?
 
 ### 早期OpenFOAM
-进行并行计算时要`decomposePar`将计算域分为多个部分，网格文件实际上也分开了。在写入的时候也是写入到每个`processor`文件中，这是早期openfoam版本的做法，弊端是产生的文件量特别大。有些机器上面，比如occigen就有文件个数的限制，只允许200000个文件。如果500个processor，一个processor里面最多只能400个文件，而一个时间步里面至少有`U, p, phi`，所以这个限制还挺严格。
+进行并行计算时要`decomposePar`将计算域分为多个部分，网格文件实际上也分开了。在写入的时候也是写入到每个`processor`文件中，这是早期OpenFOAM版本的做法，弊端是产生的文件量特别大。有些机器上面，比如occigen就有文件个数的限制，只允许200000个文件。如果500个processor，一个processor里面最多只能400个文件，而一个时间步里面至少有`U, p, phi`，所以这个限制还挺严格。
 
 如何解决？要么定期`reconstructPar`然后把那些processor里面对应的`U, p, phi`删掉，需要注意的有两点：
 1.第一个操作完成，第二步删除再进行 
-2.不要对openfoam正在读写的文件进行操作
+2.不要对OpenFOAM正在读写的文件进行操作
 第2点比较好规避，选择所有时间步，避开倒数2个，剩下的一般都写好了（因为一般输出数据间隔都不会很小）；而第1点，就需要保证第一步的返回值为0，经由判断后再进行相应删除
 
 ### 较新的OpenFOAM
@@ -33,7 +33,7 @@ IO的基本特征是硬盘读写，耗时间。
 模拟的数据输出可以选择，各有优劣：
 - binary数据存储体积更小，推荐在simu中间使用，而且在paraview读取数据的时候（20M算例，两个时间步）至少比ascii要快7倍
 - 在初始场中推荐使用ascii，因为万一要改边界条件binary格式不是那么好下手(vimdiff或者meld都对ascii支持更好)
-- 再者openfoam支持一个simu里面两种格式文件共存，utility和solver在读数据的时候都是以文件头上`format`相应格式读取
+- 再者OpenFOAM支持一个simu里面两种格式文件共存，utility和solver在读数据的时候都是以文件头上`format`相应格式读取
 
 binary或者ascii，如何在二者中转换？  
 复杂解且不完全：比如从binary转为ascii，可以用`decomposePar`然后`reconstructPar`，第二步的时候把输出格式改为ascii，`internalField`的读写应该没问题，但是BC呢还是得check一下
@@ -488,10 +488,10 @@ volTensorField identity
 
 ```
 
-# Boundary Condition
+# 编写边界条件
 
 ## fixedValueFvPatchVectorField
-Dirichlet边界(可以随时间变化)，通常继承自fixedValueFvPatchVectorField.编写边界条件的时候要注意：
+Dirichlet边界(可以随时间变化)，通常继承自`fixedValueFvPatchVectorField`，编写边界条件的时候要注意：
 
 1. data member 申明(`*.H`)和初始化(`*.C`)的顺序要一致
 2. 一定要要让所有constructor里面data member都完成初始化(`*.C`)
@@ -503,9 +503,9 @@ Dirichlet边界(可以随时间变化)，通常继承自fixedValueFvPatchVectorF
 所在边界的名字：`patch().name()`   
 当前时间步的时间参数：`this->db().time().timeOutputValue()`.在这个类`runTime`不可见
 
-# Tips
+# 常用Tips
 
-## 常用的object
+## object
 
 **timeSelector** : 通常以 -time 起，后接 `':500,1200:1300,3000:'`
 
@@ -515,25 +515,16 @@ Dirichlet边界(可以随时间变化)，通常继承自fixedValueFvPatchVectorF
 
 **mesh** : fvMesh类，可以用来遍历：`forAll(mesh.C(), celli)`，也可以通过`mesh.V()`来找网格体积
 
-## 几个函数
+## 函数
+
+### 书写文件头
 
 OpenFOAM里面文件头怎么来的？ : writeHeader
 
-## 几个坑
-
-**scalarExplicitSetValue** : 源`fvOptions/constraints/general/explicitSetValue`，居然连`field`不设置都可以不报错..
-
-**fixedTemperatureConstraint** : 是针对能量方程的constraint，即compressible solvers
-
-## 一些继承关系疏理
-
-**singlePhaseTransportModel** ： nonNewtonianIcoFoam里面通过singlePhaseTransportModel来初始化流变模型，与`viscosityModel`没有继承关系，因此`singlePhaseTransportModel`不能用Foam::tmp<Foam::volScalarField> Foam::viscosityModel::strainRate()这个方法。然而`BirdCarreau`是`viscosityModel`的子类，它是如何被`singlePhaseTransportModel`包装起来的呢？
-
-**Pstream** : 继承自`UPstream`(内有方法：parRun(), master(), procNo()...)，不过通常用的时候这样用`Pstream::master()`，用于比如输出到文件而不想因为mpi多次重复输出
-
-## 常用的功能
 ### max/min
+
 场(GeometricField，一般是某volScalarField)的最大值，最小值:（虽然我不确认并行的时候对不对）
+
 ```cpp
 max(someField); //这个给出的是internalField()和boundaryField()中数值上最大的值
 max(someField.internalField()); // 这是网格内的体积元volume中的最大值
@@ -546,9 +537,12 @@ forAll(mesh.boundaryMesh(), patchI)
 }
 //并且在求得每个边界上最大值后再从从中求最大值
 ```
-## findMax/findMin
+
+### findMax/findMin
+
 这个紧接前面，要注意的是findMax返回的index是所操作数组的index而非全局index
 面积元的[全局index](https://www.cfd-online.com/Forums/openfoam-programming-development/129723-how-get-face-ids-boundary.html)在哪里呢？
+
 ```cpp
 //  通过start()来找到全局faces中，所在patch第一个face的全局index
 forAll(mesh.boundaryMesh().names(), patchName) 
@@ -577,22 +571,117 @@ forAll(mesh.boundaryMesh().names(), patchName)
 ```
 
 ### findPatchID
+
 通过字符串来找到一个patchList里面对应的patchID
+
 ```cpp
 label patchID = mesh.boundaryMesh().findPatchID("walls"); 
 ```
 
 ### boundary value还是离网格最近的cell value?
+
 `U.boundaryField()[patchi]`这个是boundary value.`U.patchInternalField()`这是离boundary最近的cell些的U的cell value
 
 ### faceCells
+
 cell到face是很自然的，因为：cell是什么？多个face闭合起来成为cell。那怎么反过来找呢？
+
 ```cpp
 const fvPatchList& patches = mesh.boundary();
 
 patches[somePatch].faceCells[facei]; // 返回值就是patches[somePatch][facei]对应的唯一cell的cellID
 
 ```
+
+## 类
+
+### VectorSpace, Vector, Tensor: mag
+
+VectorSpace 显然是这里最具有一般性最底层的模板类了，Vector和Tensor在它眼里仅是3个元素和9个元素的差别，求`mag`都一视同仁。
+
+`mag`在VectorSpace/Vector里面就是所有元素平方和`magSqr`然后开平方，在Tensor变成9个元素平方和然后开平方。因此一般的Tensor不同重写`magSqr`，SymmTensor因为其形式特别就重写了`magSqr`，如此替换掉最一般的`magSqr`,对SymmTensor仍然可以进行`mag`操作，为什么呢？因为SymmTensor是Tensor是VectorSpace里面的元素，因此一定就有`mag`，此时母类`mag`调用的是SymmTensor版本的`magSqr`。
+
+### 外积
+
+```cpp
+#include "vector.H"
+#include "tensor.H"
+#include "IOstreams.H"
+
+using namespace Foam;
+
+int main()
+{
+/*
+    Info<< vector::zero << endl
+        << vector::one << endl
+        << vector::dim << endl
+        << vector::rank << endl;
+*/
+
+    vector a(1, 2, 3);
+    Info << "a = " << a << endl;
+    Info << "a*a = " << a*a << endl;
+
+    return 0;
+}
+
+```
+
+如果将`#include "tensor.H"`注释掉会报一个比较长的错：
+
+```bash
+$ wmake
+Making dependency list for source file Test-vector.C
+SOURCE=Test-vector.C ;  OMPI_CXX="g++" mpicxx -Dlinux64 -DWM_DP -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor -O2 -march=native -fuse-ld=bfd  -DNoRepository -ftemplate-depth-100  -IlnInclude -I. -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OSspecific/POSIX/lnInclude   -fPIC -c $SOURCE -o Make/linux64GccDPOpt/Test-vector.o
+OMPI_CXX="g++" mpicxx -Dlinux64 -DWM_DP -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor -O2 -march=native -fuse-ld=bfd  -DNoRepository -ftemplate-depth-100  -IlnInclude -I. -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OSspecific/POSIX/lnInclude   -fPIC -Xlinker --add-needed -Xlinker --no-as-needed Make/linux64GccDPOpt/Test-vector.o -L/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/platforms/linux64GccDPOpt/lib \
+      -lOpenFOAM -ldl   -lm -o /home/hluo/OpenFOAM/hluo-2.3.1/platforms/linux64GccDPOpt/bin/Test-vector
+[hluo@zaurak userVector]$ vim Test-vector.C 
+[hluo@zaurak userVector]$ wmake
+Making dependency list for source file Test-vector.C
+SOURCE=Test-vector.C ;  OMPI_CXX="g++" mpicxx -Dlinux64 -DWM_DP -Wall -Wextra -Wno-unused-parameter -Wold-style-cast -Wnon-virtual-dtor -O2 -march=native -fuse-ld=bfd  -DNoRepository -ftemplate-depth-100  -IlnInclude -I. -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude -I/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OSspecific/POSIX/lnInclude   -fPIC -c $SOURCE -o Make/linux64GccDPOpt/Test-vector.o
+Test-vector.C: In function ‘int main()’:
+Test-vector.C:18:23: error: no match for ‘operator*’ (operand types are ‘Foam::vector {aka Foam::Vector<double>}’ and ‘Foam::vector {aka Foam::Vector<double>}’)
+  Info << "a*a = " << a*a << endl;
+                       ^
+Test-vector.C:18:23: note: candidates are:
+In file included from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpace.H:168:0,
+                 from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/Vector.H:44,
+                 from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/vector.H:39,
+                 from Test-vector.C:1:
+/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpaceI.H:552:13: note: template<class Form, class Cmpt, int nCmpt> Form Foam::operator*(Foam::scalar, const Foam::VectorSpace<Form, Cmpt, nCmpt>&)
+ inline Form operator*
+             ^
+/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpaceI.H:552:13: note:   template argument deduction/substitution failed:
+Test-vector.C:18:24: note:   cannot convert ‘a’ (type ‘Foam::vector {aka Foam::Vector<double>}’) to type ‘Foam::scalar {aka double}’
+  Info << "a*a = " << a*a << endl;
+                        ^
+In file included from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpace.H:168:0,
+                 from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/Vector.H:44,
+                 from /home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/vector.H:39,
+                 from Test-vector.C:1:
+/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpaceI.H:565:13: note: template<class Form, class Cmpt, int nCmpt> Form Foam::operator*(const Foam::VectorSpace<Form, Cmpt, nCmpt>&, Foam::scalar)
+ inline Form operator*
+             ^
+/home/hluo/.local/easybuild/software/OpenFOAM/2.3.1-foss-2016a/OpenFOAM-2.3.1/src/OpenFOAM/lnInclude/VectorSpaceI.H:565:13: note:   template argument deduction/substitution failed:
+Test-vector.C:18:24: note:   cannot convert ‘a’ (type ‘Foam::vector {aka Foam::Vector<double>}’) to type ‘Foam::scalar {aka double}’
+  Info << "a*a = " << a*a << endl;
+                        ^
+make: *** [Make/linux64GccDPOpt/Test-vector.o] Error 1
+
+```
+
+报错的意思是我们找`Foam::Vector<double>`与`Foam::Vector<double>`之间的`operator*`找不到，只能有后面vector前面scalar的`operator*`（分别在VectorSpaceI.H:552和VectorSpaceI.H:565），但因为vector,tensor和VectorSpace是由一种复杂的方式耦合在一起的，所以并没有报一个找不到俩vector的外积。但如果加上"tensor.H"一切都对了，输出结果：
+
+```bash
+$ Test-vector 
+a = (1 2 3)
+a*a = (1 2 3 2 4 6 3 6 9)
+```
+
+### List
+
+`List` and `UList` are different. `List a(10)` then `a.append(something)` will append to the tail of the initialized `a` resulting a `a[11]=something` 
 
 ## 相互引用的数据
 ```cpp
@@ -608,3 +697,15 @@ this->db()
 const scalar t = this->db().time().timeOutputValue()
 
 ```
+
+# 几个坑
+
+**scalarExplicitSetValue** : 源`fvOptions/constraints/general/explicitSetValue`，居然连`field`不设置都可以不报错..
+
+**fixedTemperatureConstraint** : 是针对能量方程的constraint，即compressible solvers
+
+# 一些继承关系疏理
+
+**singlePhaseTransportModel** ： nonNewtonianIcoFoam里面通过singlePhaseTransportModel来初始化流变模型，与`viscosityModel`没有继承关系，因此`singlePhaseTransportModel`不能用`Foam::tmp<Foam::volScalarField> Foam::viscosityModel::strainRate()`这个方法。然而`BirdCarreau`是`viscosityModel`的子类，它是如何被`singlePhaseTransportModel`包装起来的呢？
+
+**Pstream** : 继承自`UPstream`(内有方法：`parRun(), master(), procNo()`...)，不过通常用的时候这样用`Pstream::master()`，用于比如输出到文件而不想因为mpi多次重复输出
