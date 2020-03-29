@@ -1,7 +1,7 @@
 ---
 title: Linux Cheat Sheet
 date: 2018-09-26 16:26:59
-tags:
+tags: cheatSheet
 ---
 
 # bash
